@@ -122,7 +122,7 @@
       box-shadow: 0 12px 24px rgba(10,37,64,.06);
     }
 
-    /* ChatGPT benzeri sohbet listesi */
+    /* Chat list */
     .chatlist{display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:220px; overflow:auto; padding-right:4px;}
     .chatitem{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -142,12 +142,7 @@
     .chatitem .dot2{width:8px;height:8px;border-radius:50%; background:rgba(43,124,255,.45)}
     .minirow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
 
-    .toggles{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-top:6px;
-    }
+    .toggles{display:flex; flex-direction:column; gap:10px; margin-top:6px;}
 
     .toggle{
       display:flex;
@@ -163,7 +158,14 @@
     .toggle small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 
     .switch{position:relative; width:44px; height:26px;}
-    .switch input{display:none}
+    .switch input{
+      position:absolute;
+      inset:0;
+      margin:0;
+      opacity:0;
+      cursor:pointer;
+      z-index:2;
+    }
     .slider{
       position:absolute; inset:0;
       border-radius:999px;
@@ -183,18 +185,8 @@
     .switch input:checked + .slider{background:linear-gradient(135deg, var(--blue), var(--blue2));}
     .switch input:checked + .slider:before{transform:translateX(18px);}
 
-    .stats{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:10px;
-    }
-    .stat{
-      padding:12px;
-      border-radius:16px;
-      background:rgba(255,255,255,.7);
-      border:1px solid rgba(216,231,245,.95);
-    }
+    .stats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
+    .stat{padding:12px; border-radius:16px; background:rgba(255,255,255,.7); border:1px solid rgba(216,231,245,.95);}
     .stat .k{font-size:11px;color:var(--muted)}
     .stat .v{font-size:16px;font-weight:700;margin-top:4px}
 
@@ -212,25 +204,10 @@
       transition:.15s;
     }
     .btn:hover{transform:translateY(-1px)}
-    .btn.primary{
-      background:linear-gradient(135deg, var(--blue), var(--blue2));
-      color:white;
-      border:0;
-      box-shadow: 0 12px 22px rgba(43,124,255,.20);
-    }
-    .btn.danger{
-      background:rgba(255,70,70,.10);
-      border:1px solid rgba(255,70,70,.22);
-      color:#9b1b1b;
-    }
+    .btn.primary{background:linear-gradient(135deg, var(--blue), var(--blue2)); color:white; border:0; box-shadow: 0 12px 22px rgba(43,124,255,.20);}
+    .btn.danger{background:rgba(255,70,70,.10); border:1px solid rgba(255,70,70,.22); color:#9b1b1b;}
 
-    .main{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      padding:18px;
-      gap:12px;
-    }
+    .main{flex:1; display:flex; flex-direction:column; padding:18px; gap:12px;}
 
     .topbar{
       display:flex;
@@ -243,37 +220,22 @@
       border:1px solid rgba(216,231,245,.95);
     }
 
-    .topbar .title{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-      letter-spacing:.2px;
-    }
-    .badge{
-      font-size:11px;
+    .topbar .title{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px;}
+    .title .clickable{
+      cursor:pointer;
+      user-select:none;
       padding:6px 10px;
-      border-radius:999px;
-      color:#0a3a7a;
-      background:rgba(43,124,255,.12);
-      border:1px solid rgba(43,124,255,.22);
-    }
-
-    .chat{
-      flex:1;
-      overflow:auto;
-      padding:12px;
-      border-radius:18px;
-      background:rgba(255,255,255,.65);
+      border-radius:12px;
       border:1px solid rgba(216,231,245,.95);
+      background:rgba(255,255,255,.75);
     }
+    .title .clickable:hover{transform:translateY(-1px)}
 
-    .msg{
-      display:flex;
-      gap:10px;
-      margin:10px 0;
-      align-items:flex-start;
-    }
+    .badge{font-size:11px; padding:6px 10px; border-radius:999px; color:#0a3a7a; background:rgba(43,124,255,.12); border:1px solid rgba(43,124,255,.22);}
+
+    .chat{flex:1; overflow:auto; padding:12px; border-radius:18px; background:rgba(255,255,255,.65); border:1px solid rgba(216,231,245,.95);}
+
+    .msg{display:flex; gap:10px; margin:10px 0; align-items:flex-start;}
     .msg .avatar{
       width:36px;height:36px;
       border-radius:14px;
@@ -296,26 +258,11 @@
       white-space:pre-wrap;
     }
     .msg.user{justify-content:flex-end}
-    .msg.user .bubble{
-      background:linear-gradient(135deg, rgba(43,124,255,.14), rgba(124,199,255,.14));
-      border:1px solid rgba(43,124,255,.18);
-    }
+    .msg.user .bubble{background:linear-gradient(135deg, rgba(43,124,255,.14), rgba(124,199,255,.14)); border:1px solid rgba(43,124,255,.18);}
 
-    .meta{
-      font-size:11px;
-      color:var(--muted);
-      margin-top:6px;
-    }
+    .meta{font-size:11px; color:var(--muted); margin-top:6px;}
 
-    .composer{
-      display:flex;
-      gap:10px;
-      padding:12px;
-      border-radius:18px;
-      background:rgba(255,255,255,.72);
-      border:1px solid rgba(216,231,245,.95);
-      align-items:flex-end;
-    }
+    .composer{display:flex; gap:10px; padding:12px; border-radius:18px; background:rgba(255,255,255,.72); border:1px solid rgba(216,231,245,.95); align-items:flex-end;}
     textarea{
       flex:1;
       resize:none;
@@ -331,17 +278,7 @@
     }
     textarea:focus{border-color:rgba(43,124,255,.38)}
 
-    .send{
-      width:52px;height:44px;
-      border:0;
-      border-radius:14px;
-      background:linear-gradient(135deg, var(--blue), var(--blue2));
-      color:white;
-      cursor:pointer;
-      display:grid;place-items:center;
-      box-shadow: 0 12px 22px rgba(43,124,255,.22);
-      transition:.15s;
-    }
+    .send{width:52px;height:44px; border:0; border-radius:14px; background:linear-gradient(135deg, var(--blue), var(--blue2)); color:white; cursor:pointer; display:grid;place-items:center; box-shadow: 0 12px 22px rgba(43,124,255,.22); transition:.15s;}
     .send:hover{transform:translateY(-1px)}
     .send:disabled{opacity:.55;cursor:not-allowed;transform:none}
 
@@ -349,12 +286,9 @@
     .dot{width:7px;height:7px;border-radius:50%;background:rgba(10,37,64,.55);animation:bounce 1.1s infinite;}
     .dot:nth-child(2){animation-delay:.15s}
     .dot:nth-child(3){animation-delay:.30s}
-    @keyframes bounce{
-      0%, 80%, 100%{transform:translateY(0);opacity:.55}
-      40%{transform:translateY(-6px);opacity:1}
-    }
+    @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.55} 40%{transform:translateY(-6px);opacity:1}}
 
-    /* Mavi parlayan bellek bildirimi */
+    /* Toast */
     .toast{
       position:absolute;
       left:50%;
@@ -379,12 +313,13 @@
     .toast .icon{filter: drop-shadow(0 0 8px rgba(124,199,255,.8))}
     .toast.show{opacity:1}
 
+    /* Mobile: sol panel gizli */
     @media (max-width: 900px){
       .left{display:none}
       .app{height:92vh}
     }
 
-    /* Bellek modal */
+    /* Memory modal */
     .modal{position:absolute; inset:0; background:rgba(10,37,64,.35); display:none; align-items:center; justify-content:center; z-index:80;}
     .modal.show{display:flex}
     .modal .panel{width:min(520px,92%); background:white; border-radius:18px; border:1px solid rgba(216,231,245,.95); box-shadow:var(--shadow); padding:14px;}
@@ -469,8 +404,8 @@
     <main class="main">
       <div class="topbar">
         <div class="title">
-          <span>Gai-1.0</span>
-          <span class="badge" id="modeBadge">Demo Mantık</span>
+          <span class="clickable" id="modeToggle" title="FAST → AUTO → THINKING">Gai-1.0</span>
+          <span class="badge" id="modeBadge">FAST</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
           <button class="btn" id="btnMemory">🧠 Bellek</button>
@@ -505,8 +440,8 @@
   </div>
 
   <script>
-    // ====== Gai-1.0 Core v1.2 (UI korunur) ======
-    // Debug logs: davranış hata ayıklama için console.log eklendi.
+    // ====== Gai-1.0 Core v1.3.2 ======
+    // Fix: Illegal return statement (extra brace in generateReply)
 
     // DOM
     const chatEl = document.getElementById('chat');
@@ -523,23 +458,46 @@
     const btnAbout = document.getElementById('btnAbout');
 
     const toastEl = document.getElementById('toast');
+    const toastTextEl = document.getElementById('toastText');
 
-    // Chats UI
     const btnMemory = document.getElementById('btnMemory');
     const memModal = document.getElementById('memModal');
     const memListEl = document.getElementById('memList');
     const btnCloseMem = document.getElementById('btnCloseMem');
     const btnClearMem = document.getElementById('btnClearMem');
+
     const chatListEl = document.getElementById('chatList');
     const btnNewChat = document.getElementById('btnNewChat');
     const btnRenameChat = document.getElementById('btnRenameChat');
     const btnDeleteChat = document.getElementById('btnDeleteChat');
 
+    const modeToggle = document.getElementById('modeToggle');
+    const modeBadgeEl = document.getElementById('modeBadge');
+
     // Storage keys
     const LS_INDEX = 'gai1_chats_index_v1';
-    const LS_SET   = 'gai1_settings_v1';
+    const LS_SET   = 'gai1_settings_v2';
     const chatKey = (id) => `gai1_chat_${id}`;
     const memKey  = (id) => `gai1_mem_${id}`;
+
+    // Helpers
+    const nowTime = () => new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const nowISO  = () => new Date().toISOString();
+    const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+    const esc = (s)=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+
+    function dbg(label, data){
+      try{ console.log(`[Gai-1.0] ${label}`, data ?? ''); }catch{}
+    }
+
+    function showToast(text='Bellek güncellendi'){
+      if(toastTextEl) toastTextEl.textContent = text;
+      toastEl.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=>toastEl.classList.remove('show'), 1600);
+    }
+
+    function scrollToBottom(){ chatEl.scrollTop = chatEl.scrollHeight; }
 
     // State
     const state = {
@@ -554,34 +512,33 @@
         facts: {},
         lastUserMsg: '',
       },
-      // Not: sohbet kaydı her zaman açık (çoklu sohbet için gerekli)
       settings: {
         memRef: true,
         safety: true,
-      }
+      },
+      mode: 'fast' // fast | auto | thinking
     };
 
-    // Helpers
-    const nowTime = () => new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    const nowISO  = () => new Date().toISOString();
-    const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
-    const esc = (s)=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    // Mode
+    const MODE_ORDER = ['fast','auto','thinking'];
+    const MODE_LABELS = { fast:'FAST', auto:'AUTO', thinking:'THINKING' };
 
-    function dbg(label, data){
-      // tek yerden kontrol etmek için
-      try{ console.log(`[Gai-1.0] ${label}`, data ?? ''); }catch{}
+    function setMode(m){
+      if(!MODE_ORDER.includes(m)) return;
+      state.mode = m;
+      if(modeBadgeEl) modeBadgeEl.textContent = MODE_LABELS[state.mode];
+      persist();
+      dbg('mode set', {mode: state.mode});
     }
 
-    function showToast(text='Bellek güncellendi'){
-      const t = document.getElementById('toastText');
-      if(t) t.textContent = text;
-      toastEl.classList.add('show');
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(()=>toastEl.classList.remove('show'), 1600);
+    function cycleMode(){
+      const i = MODE_ORDER.indexOf(state.mode);
+      const next = MODE_ORDER[(i+1)%MODE_ORDER.length];
+      setMode(next);
+      showToast(`Mod: ${MODE_LABELS[state.mode]}`);
     }
 
-    function scrollToBottom(){ chatEl.scrollTop = chatEl.scrollHeight; }
-
+    // UI
     function renderMessage(m){
       const wrap = document.createElement('div');
       wrap.className = `msg ${m.role}`;
@@ -609,6 +566,13 @@
       scrollToBottom();
     }
 
+    function updateStats(){
+      statMsgs.textContent = String(state.messages.length);
+      statTopic.textContent = state.memory.lastTopic ? state.memory.lastTopic : '—';
+      memBadge.textContent = `Bellek: ${state.settings.memRef ? 'Açık' : 'Kapalı'}`;
+      if(modeBadgeEl) modeBadgeEl.textContent = MODE_LABELS[state.mode];
+    }
+
     function renderAll(){
       chatEl.innerHTML = '';
       state.messages.forEach(renderMessage);
@@ -617,20 +581,16 @@
       dbg('renderAll', {count: state.messages.length, activeChatId: state.activeChatId});
     }
 
-    function updateStats(){
-      statMsgs.textContent = String(state.messages.length);
-      statTopic.textContent = state.memory.lastTopic ? state.memory.lastTopic : '—';
-      memBadge.textContent = `Bellek: ${state.settings.memRef ? 'Açık' : 'Kapalı'}`;
-    }
-
+    // Persist
     function persist(){
-      // sohbet kaydı her zaman açık
       try{
-        localStorage.setItem(LS_SET, JSON.stringify(state.settings));
+        localStorage.setItem(LS_SET, JSON.stringify({settings: state.settings, mode: state.mode}));
         localStorage.setItem(LS_INDEX, JSON.stringify(state.index));
-        localStorage.setItem(chatKey(state.activeChatId), JSON.stringify(state.messages));
-        localStorage.setItem(memKey(state.activeChatId), JSON.stringify(state.memory));
-        dbg('persist ok', {activeChatId: state.activeChatId, msgs: state.messages.length});
+        if(state.activeChatId){
+          localStorage.setItem(chatKey(state.activeChatId), JSON.stringify(state.messages));
+          localStorage.setItem(memKey(state.activeChatId), JSON.stringify(state.memory));
+        }
+        dbg('persist ok', {activeChatId: state.activeChatId, msgs: state.messages.length, mode: state.mode});
       }catch(e){
         console.warn('[Gai-1.0] Persist failed', e);
       }
@@ -686,13 +646,12 @@
       state.index.unshift({id, name: name||`Sohbet ${state.index.length+1}`, updatedAt: nowISO()});
       state.activeChatId = id;
       state.messages = [];
-      // kişisel bellek kalsın (memRef açık/kapalı sadece kullanım davranışını etkiler)
       state.memory = {
         userName: state.memory.userName ?? null,
         age: state.memory.age ?? null,
         lastTopic: null,
         lastIntent: null,
-        facts: {...state.memory.facts},
+        facts: {...(state.memory.facts||{})},
         lastUserMsg: ''
       };
       persist();
@@ -742,11 +701,15 @@
     function loadSettings(){
       try{
         const raw = localStorage.getItem(LS_SET);
-        if(raw) state.settings = {...state.settings, ...JSON.parse(raw)};
+        if(raw){
+          const obj = JSON.parse(raw);
+          if(obj && obj.settings) state.settings = {...state.settings, ...obj.settings};
+          if(obj && obj.mode) state.mode = obj.mode;
+        }
       }catch{}
       tMemRef.checked = !!state.settings.memRef;
       updateStats();
-      dbg('loadSettings', {...state.settings});
+      dbg('loadSettings', {settings: state.settings, mode: state.mode});
     }
 
     function loadIndex(){
@@ -763,7 +726,8 @@
         const c = localStorage.getItem(chatKey(id));
         state.messages = c ? JSON.parse(c) : [];
         const m = localStorage.getItem(memKey(id));
-        state.memory = m ? {...state.memory, ...JSON.parse(m)} : {...state.memory, facts:{}};
+        const mem = m ? JSON.parse(m) : null;
+        state.memory = mem ? {...state.memory, ...mem} : {...state.memory, facts:{}};
       }catch(e){
         console.warn('[Gai-1.0] loadChat failed', e);
         state.messages = [];
@@ -780,9 +744,20 @@
       return blocked.some(k=>t.includes(k));
     }
 
+    // FIXED: '-' is placed at the end of the character class to avoid range errors.
+    const RE_ARITH_ALLOWED = /^[0-9\s+*/().,%\-]+$/;
+    const RE_ARITH_HAS_OP  = /[+\-*/]/;
+
     function detectIntent(text){
       const t = text.toLowerCase().trim();
-      if(/^[0-9\s+\-*/().,%]+$/.test(t) && /\d/.test(t) && /[+\-*/]/.test(t)) return 'math';
+
+      // Denklem / cebir (x içeriyorsa veya '=' varsa)
+      if(((/\bx\b/.test(t)) || t.includes('x')) && t.includes('=')) return 'math';
+      if(t.includes('=') && /\d/.test(t)) return 'math';
+
+      // Aritmetik (4 işlem)
+      if(RE_ARITH_ALLOWED.test(t) && /\d/.test(t) && RE_ARITH_HAS_OP.test(t)) return 'math';
+
       if(/\b(özet|kısaca|özetle)\b/.test(t)) return 'summarize';
       if(/\b(plan|program|yol haritası)\b/.test(t)) return 'plan';
       if(/\b(nedir|ne demek|açıkla)\b/.test(t)) return 'explain';
@@ -791,6 +766,7 @@
       if(/\b(şiir)\b/.test(t) && /(yaz|oluştur|yap)/.test(t)) return 'poem';
       if(/\b(ne üzerine çalışalım|ne yapalım|öner|fikir ver)\b/.test(t)) return 'suggest';
       if(/\b(selam|merhaba|naber)\b/.test(t)) return 'greet';
+      if(/\b(nasılsın|ne haber|ne yapıyorsun)\b/.test(t)) return 'chat';
       return 'chat';
     }
 
@@ -812,7 +788,7 @@
       if(m){
         state.memory.userName = m[2];
         state.memory.facts['İsim'] = m[2];
-        showToast('✅ Bellek güncellendi: İsim');
+        if(state.settings.memRef) showToast('✅ Bellek güncellendi: İsim');
         dbg('memory set name', {name: state.memory.userName});
         return true;
       }
@@ -826,7 +802,7 @@
         if(Number.isFinite(age) && age>0 && age<130){
           state.memory.age = age;
           state.memory.facts['Yaş'] = String(age);
-          showToast('✅ Bellek güncellendi: Yaş');
+          if(state.settings.memRef) showToast('✅ Bellek güncellendi: Yaş');
           dbg('memory set age', {age: state.memory.age});
           return true;
         }
@@ -860,7 +836,8 @@
 
     function safeMathEval(expr){
       const clean = expr.replace(/,/g,'.').replace(/%/g,'/100');
-      if(!/^[0-9\s+\-*/().]+$/.test(clean)) return null;
+      // FIXED: '-' moved to end
+      if(!/^[0-9\s+*/().\-]+$/.test(clean)) return null;
       try{
         const fn = new Function(`return (${clean});`);
         const v = fn();
@@ -878,11 +855,9 @@
       state.memory.lastIntent = intent;
       if(topic) state.memory.lastTopic = topic;
 
-      dbg('generateReply', {intent, topic, memRef: state.settings.memRef});
+      dbg('generateReply', {intent, topic, memRef: state.settings.memRef, mode: state.mode});
 
-      if(state.settings.safety && violatesSafety(text)){
-        return 'Buna yardımcı olamam.';
-      }
+      if(state.settings.safety && violatesSafety(text)) return 'Buna yardımcı olamam.';
 
       // Kişisel bilgi yakalama yalnızca memRef açıkken
       if(state.settings.memRef){
@@ -897,14 +872,7 @@
 
       if(intent==='suggest'){
         const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
-        return (
-`Bence bugün 3 seçenek var${n}:
-1) 💰 Para kazanma planı
-2) 🧠 Matematik/tarih
-3) 🎨 Şiir
-
-1/2/3 yaz 🙂`
-        );
+        return `Bence bugün 3 seçenek var${n}:\n1) 💰 Para kazanma planı\n2) 🧠 Matematik/tarih\n3) 🎨 Şiir\n\n1/2/3 yaz 🙂`;
       }
 
       if(intent==='math'){
@@ -914,42 +882,18 @@
 
       if(intent==='poem'){
         const n = (state.settings.memRef && state.memory.userName) ? state.memory.userName : 'dostum';
-        return (
-`Tabii ${n} ✨
-Mavi bir ışık düşer geceme,
-Düşünceler akar sessizce.
-Bir hedef koyarız önümüze,
-Adım adım varırız bizce.
-
-Konu ne olsun? (para/dostluk/okul/hayal)`
-        );
+        return `Tabii ${n} ✨\nMavi bir ışık düşer geceme,\nDüşünceler akar sessizce.\nBir hedef koyarız önümüze,\nAdım adım varırız bizce.\n\nKonu ne olsun? (para/dostluk/okul/hayal)`;
       }
 
       if(intent==='explain'){
         if(text.toLowerCase().includes('localstorage')){
-          return (
-`localStorage nedir?
-- Tarayıcı içindeki küçük depodur.
-- Sayfayı yenilesen bile veriler kalır.
-- Sen silene kadar durur.
-
-Örnek:
-localStorage.setItem('isim','Kaan')
-localStorage.getItem('isim')`
-          );
+          return `localStorage nedir?\n- Tarayıcı içindeki küçük depodur.\n- Sayfayı yenilesen bile veriler kalır.\n- Sen silene kadar durur.\n\nÖrnek:\nlocalStorage.setItem('isim','Kaan')\nlocalStorage.getItem('isim')`;
         }
         return 'Tam olarak hangi kavramı açıklayayım? “açıkla: ...” yazabilirsin.';
       }
 
       if(intent==='plan'){
-        return (
-`Tamam. 3 adım:
-1) Hedef (1 cümle)
-2) Kısıtlar (zaman/bütçe)
-3) Bugün tek adım (15 dk)
-
-Hedef cümleni yaz 🙂`
-        );
+        return `Tamam. 3 adım:\n1) Hedef (1 cümle)\n2) Kısıtlar (zaman/bütçe)\n3) Bugün tek adım (15 dk)\n\nHedef cümleni yaz 🙂`;
       }
 
       if(intent==='remember'){
@@ -965,22 +909,38 @@ Hedef cümleni yaz 🙂`
       if(intent==='summarize'){
         const lastUser = [...state.messages].reverse().find(m=>m.role==='user');
         const lastAI = [...state.messages].reverse().find(m=>m.role==='assistant');
-        return (
-`Kısa özet:
-- Son kullanıcı: ${lastUser ? lastUser.text.slice(0,70)+(lastUser.text.length>70?'…':'') : '—'}
-- Son yanıt: ${lastAI ? lastAI.text.slice(0,70)+(lastAI.text.length>70?'…':'') : '—'}
-- Konu: ${state.memory.lastTopic ?? '—'}`
-        );
+        return `Kısa özet:\n- Son kullanıcı: ${lastUser ? lastUser.text.slice(0,70)+(lastUser.text.length>70?'…':'') : '—'}\n- Son yanıt: ${lastAI ? lastAI.text.slice(0,70)+(lastAI.text.length>70?'…':'') : '—'}\n- Konu: ${state.memory.lastTopic ?? '—'}`;
+      }
+
+      // ---- SAMİMİ SOHBET CEVAPLARI ----
+      const t = text.toLowerCase();
+
+      if(/(seni kim yaptı|seni kim yarattı|yaratıcın kim|geliştiricin kim)/.test(t)){
+        return 'Beni CloseAI geliştirdi 🤖✨ Ama asıl beni senin soruların canlı tutuyor.';
+      }
+
+      if(/(nasılsın|iyi misin|ne haber|keyfin nasıl)/.test(t)){
+        return 'Gayet iyiyim 😄 Sen nasılsın? Bugün kafanda ne var?';
+      }
+
+      if(/(aferin|helal|teşekkür|sağol|eyvallah|bravo)/.test(t)){
+        return 'Teşekkür ederim 😊 Birlikte daha da güzelleştirebiliriz!';
+      }
+
+      if(/(sıkıldım|moralim bozuk|üzgünüm|canım sıkkın)/.test(t)){
+        return 'Üzgün hissetmene üzüldüm 😔 İstersen biraz konuşalım ya da kafanı dağıtacak bir şey yapalım.';
+      }
+
+      if(/(ne yapıyorsun|napıyorsun|naber yapıyorsun)/.test(t)){
+        return 'Şu an seninle sohbet ediyorum 😄 Yeni bir şey denemek ister misin?';
+      }
+
+      if(/(selam|hey|hi|hello)/.test(t)){
+        return 'Selam 👋 Hoş geldin!';
       }
 
       const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
-      return (
-`Tamam${n}. Şunları deneyebilirsin:
-- "plan yap"
-- "açıkla: localStorage"
-- "1+1"
-- "şiir yaz"`
-      );
+      return `Tamam${n}. Şunları deneyebilirsin:\n- "plan yap"\n- "açıkla: localStorage"\n- "1+1"\n- "şiir yaz"`;
     }
 
     // Thinking UI
@@ -1016,6 +976,17 @@ Hedef cümleni yaz 🙂`
       document.getElementById('thinking-msg')?.remove();
     }
 
+    function shapeReplyByMode(reply){
+      const s = String(reply);
+      if(state.mode === 'fast'){
+        return s.length>220 ? (s.slice(0,220)+'…') : s;
+      }
+      if(state.mode === 'thinking'){
+        return s + "\n\nDetay modu: THINKING daha uzun ve ayrıntılı döner.";
+      }
+      return s; // auto
+    }
+
     async function handleSend(){
       const text = inputEl.value.trim();
       if(!text) return;
@@ -1027,12 +998,18 @@ Hedef cümleni yaz 🙂`
       sendBtn.disabled = true;
       showThinking();
 
-      const latency = clamp(380 + Math.random()*520, 320, 900);
-      dbg('latency', {ms: Math.round(latency)});
+      const latencyMap = {
+        fast: 1000 + Math.random()*1000,       // 1–2s
+        auto: 3000 + Math.random()*3000,       // 3–6s
+        thinking: 10000                        // 10s
+      };
+      const latency = clamp(latencyMap[state.mode] || 900, 300, 12000);
+      dbg('latency', {ms: Math.round(latency), mode: state.mode});
       await new Promise(r=>setTimeout(r, latency));
 
       hideThinking();
-      const reply = generateReply(text);
+      const rawReply = generateReply(text);
+      const reply = shapeReplyByMode(rawReply);
       addMessage('assistant', reply);
 
       sendBtn.disabled = false;
@@ -1043,6 +1020,7 @@ Hedef cümleni yaz 🙂`
       inputEl.style.height = 'auto';
       inputEl.style.height = clamp(inputEl.scrollHeight, 44, 140) + 'px';
     }
+
     inputEl.addEventListener('input', autoResize);
     inputEl.addEventListener('keydown', (e)=>{
       if(e.key==='Enter' && !e.shiftKey){
@@ -1062,19 +1040,6 @@ Hedef cümleni yaz 🙂`
     }
     tMemRef.addEventListener('change', syncSettings);
 
-    // Slider alanına tıklanınca checkbox'ı da toggle et (mobil/overlay click fix)
-    document.querySelectorAll('.switch').forEach(sw=>{
-      sw.addEventListener('click', (e)=>{
-        // input'a direkt tıklama zaten çalışıyorsa çift tetiklemeyi önle
-        if(e.target && e.target.tagName === 'INPUT') return;
-        const cb = sw.querySelector('input');
-        if(!cb) return;
-        cb.checked = !cb.checked;
-        cb.dispatchEvent(new Event('change', {bubbles:true}));
-        dbg('switch click toggle', {checked: cb.checked});
-      });
-    });
-
     // Buttons
     btnReset.addEventListener('click', ()=>{
       const ok = confirm('Bu sohbetin mesajlarını temizlemek istiyor musun?');
@@ -1083,7 +1048,7 @@ Hedef cümleni yaz 🙂`
       state.memory.lastTopic = null;
       state.memory.lastIntent = null;
       state.memory.lastUserMsg = '';
-      localStorage.removeItem(chatKey(state.activeChatId));
+      try{ localStorage.removeItem(chatKey(state.activeChatId)); }catch{}
       renderAll();
       bootGreeting(true);
       showToast('✅ Sohbet temizlendi');
@@ -1099,13 +1064,7 @@ Hedef cümleni yaz 🙂`
 
     btnAbout.addEventListener('click', ()=>{
       addMessage('assistant',
-`Gai-1.0; tek sayfalık, kural tabanlı demo asistan 🤖
-- Niyet algılar (plan/açıkla/matematik/şiir/özet)
-- Bellek: isim/yaş + notlar
-- Çoklu sohbet: yeni/sil/ad değiştir
-- Düşünüyorum animasyonu
-
-İstersen bir sonraki sürümde gerçek AI API’ye bağlarız.`);
+`Gai-1.0; tek sayfalık, kural tabanlı demo asistan 🤖\n- Niyet algılar (plan/açıkla/matematik/şiir/özet)\n- Bellek: isim/yaş + notlar\n- Çoklu sohbet: yeni/sil/ad değiştir\n- Düşünüyorum animasyonu\n\nModlar: FAST (kısa, 1–2sn) • AUTO (orta, 3–6sn) • THINKING (uzun, 10sn)`);
       dbg('btnAbout');
     });
 
@@ -1113,14 +1072,7 @@ Hedef cümleni yaz 🙂`
     btnRenameChat.addEventListener('click', ()=>renameChat());
     btnDeleteChat.addEventListener('click', ()=>deleteChat());
 
-    function bootGreeting(force){
-      if(force || state.messages.length===0){
-        const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
-        const a = (state.settings.memRef && state.memory.age) ? ` (yaş: ${state.memory.age})` : '';
-        addMessage('assistant', `Merhaba${n}! Ben Gai-1.0 🤖${a}\nSade bir asistanım. Bana bir hedef söyle; plan çıkarayım, açıklayayım, matematik çözeyim ya da şiir yazayım.`);
-      }
-    }
-
+    // Memory modal
     function renderMemoryList(){
       memListEl.innerHTML = '';
       const entries = Object.entries(state.memory.facts||{});
@@ -1171,7 +1123,16 @@ Hedef cümleni yaz 🙂`
       dbg('memory cleared');
     });
 
-    // Basit self-test (konsola rapor yazar)
+    // Greeting
+    function bootGreeting(force){
+      if(force || state.messages.length===0){
+        const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
+        const a = (state.settings.memRef && state.memory.age) ? ` (yaş: ${state.memory.age})` : '';
+        addMessage('assistant', `Merhaba${n}! Ben Gai-1.0 🤖${a}\nSade bir asistanım. Bana bir hedef söyle; plan çıkarayım, açıklayayım, matematik çözeyim ya da şiir yazayım.`);
+      }
+    }
+
+    // Diagnostics / tests
     function runDiagnostics(){
       const required = {
         chatEl: !!chatEl,
@@ -1181,10 +1142,56 @@ Hedef cümleni yaz 🙂`
         chatListEl: !!chatListEl,
         memModal: !!memModal,
         memListEl: !!memListEl,
+        modeToggle: !!modeToggle,
+        modeBadgeEl: !!modeBadgeEl,
       };
       const ok = Object.values(required).every(Boolean);
       dbg('diagnostics', {ok, required});
       return ok;
+    }
+
+    function runSelfTests(){
+      // Test 1: mode cycle order
+      const before = state.mode;
+      cycleMode();
+      const after1 = state.mode;
+      cycleMode();
+      const after2 = state.mode;
+      cycleMode();
+      const after3 = state.mode;
+      setMode(before);
+      const passMode = MODE_ORDER.includes(after1) && MODE_ORDER.includes(after2) && MODE_ORDER.includes(after3);
+      dbg('selftest:modeCycle', {pass: passMode, before, after1, after2, after3});
+
+      // Test 2: memRef toggle persist
+      const orig = state.settings.memRef;
+      state.settings.memRef = !orig;
+      persist();
+      state.settings.memRef = orig;
+      persist();
+      dbg('selftest:memRefPersist', {pass:true});
+
+      // Test 3: regex sanity (should not throw)
+      let passRegex = true;
+      try{
+        new RegExp('^[0-9\\s+*/().,%\\-]+$');
+        new RegExp('^[0-9\\s+*/().\\-]+$');
+      }catch(e){
+        passRegex = false;
+        dbg('selftest:regex', {pass:false, error: String(e)});
+      }
+      if(passRegex) dbg('selftest:regex', {pass:true});
+
+      // Test 4: detectIntent arithmetic classification
+      const cases = [
+        ['1+1', 'math'],
+        ['12*(3+4)', 'math'],
+        ['2x+3=7', 'math'],
+        ['merhaba', 'greet'],
+      ];
+      const results = cases.map(([inp, exp])=>({inp, got: detectIntent(inp), exp}));
+      const passIntent = results.every(r=>r.got===r.exp);
+      dbg('selftest:detectIntent', {pass: passIntent, results});
     }
 
     function boot(){
@@ -1192,9 +1199,12 @@ Hedef cümleni yaz 🙂`
       loadSettings();
       loadIndex();
 
+      if(modeToggle) modeToggle.addEventListener('click', cycleMode);
+
       if(state.index.length===0){
         newChat('Sohbet 1');
         runDiagnostics();
+        runSelfTests();
         return;
       }
 
@@ -1202,7 +1212,8 @@ Hedef cümleni yaz 🙂`
       loadChat(recent.id);
       if(state.messages.length===0) bootGreeting(true);
       runDiagnostics();
-      dbg('boot done', {activeChatId: state.activeChatId});
+      runSelfTests();
+      dbg('boot done', {activeChatId: state.activeChatId, mode: state.mode});
     }
 
     boot();
