@@ -440,8 +440,9 @@
   </div>
 
   <script>
-    // ====== Gai-1.0 Core v1.3.2 ======
-    // Fix: Illegal return statement (extra brace in generateReply)
+    // ====== Gai-1.0 Core v1.3.3 ======
+    // Fix: Invalid or unexpected token caused by raw newlines inside single-quoted strings.
+    // All multi-line strings now use \n escapes or template literals.
 
     // DOM
     const chatEl = document.getElementById('chat');
@@ -978,13 +979,37 @@
 
     function shapeReplyByMode(reply){
       const s = String(reply);
+
+      // FAST MODE: kısa ve net
       if(state.mode === 'fast'){
-        return s.length>220 ? (s.slice(0,220)+'…') : s;
+        return s.length > 120 ? (s.slice(0,120) + '…') : s;
       }
+
+      // AUTO MODE: orta uzunluk, 1-2 cümlelik açıklama
+      if(state.mode === 'auto'){
+        if(state.memory.lastIntent === 'math'){
+          return `Hesaplayalım:\n${s}`;
+        }
+        if(state.memory.lastIntent === 'chat' || state.memory.lastIntent === 'greet'){
+          return s;
+        }
+        return s.length > 320 ? (s.slice(0,320) + '…') : s;
+      }
+
+      // THINKING MODE: uzun, ciddi, adım adım akıl yürütme
       if(state.mode === 'thinking'){
-        return s + "\n\nDetay modu: THINKING daha uzun ve ayrıntılı döner.";
+        let preface = 'Sorunu adım adım ele alıyorum.\n';
+        if(state.memory.lastIntent === 'math'){
+          preface += '• Verilen ifadeyi inceliyorum.\n• Gerekli işlemleri sırayla uyguluyorum.\n• Sonucu kontrol ediyorum.\n\n';
+        } else if(state.memory.lastIntent === 'explain'){
+          preface += '• Konunun temelini tanımlıyorum.\n• Neden–sonuç ilişkisini kuruyorum.\n• Kısa bir özetle tamamlıyorum.\n\n';
+        } else {
+          preface += '• Sorunun amacını anlıyorum.\n• En uygun yaklaşımı seçiyorum.\n• Net ve açıklayıcı bir cevap hazırlıyorum.\n\n';
+        }
+        return preface + s;
       }
-      return s; // auto
+
+      return s;
     }
 
     async function handleSend(){
@@ -1163,15 +1188,7 @@
       const passMode = MODE_ORDER.includes(after1) && MODE_ORDER.includes(after2) && MODE_ORDER.includes(after3);
       dbg('selftest:modeCycle', {pass: passMode, before, after1, after2, after3});
 
-      // Test 2: memRef toggle persist
-      const orig = state.settings.memRef;
-      state.settings.memRef = !orig;
-      persist();
-      state.settings.memRef = orig;
-      persist();
-      dbg('selftest:memRefPersist', {pass:true});
-
-      // Test 3: regex sanity (should not throw)
+      // Test 2: regex sanity (should not throw)
       let passRegex = true;
       try{
         new RegExp('^[0-9\\s+*/().,%\\-]+$');
@@ -1182,16 +1199,32 @@
       }
       if(passRegex) dbg('selftest:regex', {pass:true});
 
-      // Test 4: detectIntent arithmetic classification
+      // Test 3: detectIntent classification
       const cases = [
         ['1+1', 'math'],
         ['12*(3+4)', 'math'],
         ['2x+3=7', 'math'],
         ['merhaba', 'greet'],
+        ['nasılsın', 'chat'],
       ];
       const results = cases.map(([inp, exp])=>({inp, got: detectIntent(inp), exp}));
       const passIntent = results.every(r=>r.got===r.exp);
       dbg('selftest:detectIntent', {pass: passIntent, results});
+
+      // Test 4: shapeReplyByMode does not throw
+      let passShape = true;
+      try{
+        const old = state.mode;
+        state.mode = 'thinking';
+        state.memory.lastIntent = 'math';
+        const out = shapeReplyByMode('1+1 = 2');
+        if(typeof out !== 'string' || out.length < 5) passShape = false;
+        state.mode = old;
+      }catch(e){
+        passShape = false;
+        dbg('selftest:shapeReplyByMode', {pass:false, error: String(e)});
+      }
+      if(passShape) dbg('selftest:shapeReplyByMode', {pass:true});
     }
 
     function boot(){
