@@ -1,0 +1,1211 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gai-1.0</title>
+  <style>
+    :root{
+      --bg:#f6fbff;
+      --panel:#ffffff;
+      --ink:#0a2540;
+      --muted:#5b6b7a;
+      --line:#d8e7f5;
+      --blue:#2b7cff;
+      --blue2:#7cc7ff;
+      --shadow: 0 10px 30px rgba(11,43,82,.10);
+      --radius: 18px;
+      --radius2: 14px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--ink);
+      background:
+        radial-gradient(900px 400px at 20% 10%, rgba(124,199,255,.35), transparent 60%),
+        radial-gradient(700px 380px at 85% 25%, rgba(43,124,255,.20), transparent 60%),
+        radial-gradient(900px 420px at 40% 90%, rgba(124,199,255,.20), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+    }
+
+    .app{
+      width:min(980px, 100%);
+      height:min(760px, 92vh);
+      background:rgba(255,255,255,.70);
+      border:1px solid rgba(216,231,245,.9);
+      border-radius:calc(var(--radius) + 10px);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      display:flex;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .waves{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.55;
+      background:
+        repeating-linear-gradient(135deg,
+          rgba(43,124,255,.045) 0px,
+          rgba(43,124,255,.045) 10px,
+          rgba(124,199,255,.030) 10px,
+          rgba(124,199,255,.030) 22px
+        );
+      mask-image: radial-gradient(1200px 600px at 20% 10%, black 20%, transparent 70%);
+    }
+
+    .left{
+      width:320px;
+      background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65));
+      border-right:1px solid rgba(216,231,245,.9);
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 10px;
+      border-radius:16px;
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(216,231,245,.9);
+    }
+
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.2) 35%),
+        linear-gradient(135deg, var(--blue), var(--blue2));
+      box-shadow: 0 10px 24px rgba(43,124,255,.22);
+      display:grid;place-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:before{
+      content:"";
+      position:absolute;
+      width:80px;height:80px;
+      background:radial-gradient(circle, rgba(255,255,255,.35), transparent 60%);
+      transform:translate(-18px,-14px);
+    }
+    .logo svg{position:relative}
+
+    .brand h1{
+      font-size:18px;
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .card{
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(216,231,245,.95);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: 0 12px 24px rgba(10,37,64,.06);
+    }
+
+    /* ChatGPT benzeri sohbet listesi */
+    .chatlist{display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:220px; overflow:auto; padding-right:4px;}
+    .chatitem{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px; border-radius:14px;
+      border:1px solid rgba(216,231,245,.95);
+      background:rgba(246,251,255,.7);
+      cursor:pointer; transition:.12s;
+    }
+    .chatitem:hover{transform:translateY(-1px)}
+    .chatitem.active{
+      border-color:rgba(43,124,255,.35);
+      background:linear-gradient(135deg, rgba(43,124,255,.10), rgba(124,199,255,.10));
+      box-shadow: 0 10px 18px rgba(43,124,255,.10);
+    }
+    .chatitem .name{font-weight:800; font-size:12.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .chatitem .mini{font-size:11px; color:var(--muted); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .chatitem .dot2{width:8px;height:8px;border-radius:50%; background:rgba(43,124,255,.45)}
+    .minirow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+
+    .toggles{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(216,231,245,.95);
+      background:rgba(246,251,255,.7);
+    }
+    .toggle label{font-size:13px;color:var(--ink)}
+    .toggle small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+
+    .switch{position:relative; width:44px; height:26px;}
+    .switch input{display:none}
+    .slider{
+      position:absolute; inset:0;
+      border-radius:999px;
+      background:rgba(91,107,122,.25);
+      transition:.2s;
+    }
+    .slider:before{
+      content:"";
+      position:absolute;
+      width:20px;height:20px;
+      left:3px;top:3px;
+      border-radius:50%;
+      background:white;
+      box-shadow:0 8px 16px rgba(0,0,0,.10);
+      transition:.2s;
+    }
+    .switch input:checked + .slider{background:linear-gradient(135deg, var(--blue), var(--blue2));}
+    .switch input:checked + .slider:before{transform:translateX(18px);}
+
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .stat{
+      padding:12px;
+      border-radius:16px;
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(216,231,245,.95);
+    }
+    .stat .k{font-size:11px;color:var(--muted)}
+    .stat .v{font-size:16px;font-weight:700;margin-top:4px}
+
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      border:0;
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(216,231,245,.95);
+      color:var(--ink);
+      cursor:pointer;
+      font-weight:600;
+      font-size:12.5px;
+      transition:.15s;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{
+      background:linear-gradient(135deg, var(--blue), var(--blue2));
+      color:white;
+      border:0;
+      box-shadow: 0 12px 22px rgba(43,124,255,.20);
+    }
+    .btn.danger{
+      background:rgba(255,70,70,.10);
+      border:1px solid rgba(255,70,70,.22);
+      color:#9b1b1b;
+    }
+
+    .main{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      padding:18px;
+      gap:12px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(216,231,245,.95);
+    }
+
+    .topbar .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      color:#0a3a7a;
+      background:rgba(43,124,255,.12);
+      border:1px solid rgba(43,124,255,.22);
+    }
+
+    .chat{
+      flex:1;
+      overflow:auto;
+      padding:12px;
+      border-radius:18px;
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(216,231,245,.95);
+    }
+
+    .msg{
+      display:flex;
+      gap:10px;
+      margin:10px 0;
+      align-items:flex-start;
+    }
+    .msg .avatar{
+      width:36px;height:36px;
+      border-radius:14px;
+      display:grid;place-items:center;
+      flex:0 0 auto;
+      border:1px solid rgba(216,231,245,.95);
+      background:rgba(255,255,255,.8);
+    }
+    .msg.user .avatar{background:rgba(43,124,255,.10)}
+
+    .bubble{
+      max-width:min(680px, 90%);
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(216,231,245,.95);
+      background:rgba(255,255,255,.82);
+      box-shadow: 0 10px 22px rgba(10,37,64,.05);
+      line-height:1.35;
+      font-size:14px;
+      white-space:pre-wrap;
+    }
+    .msg.user{justify-content:flex-end}
+    .msg.user .bubble{
+      background:linear-gradient(135deg, rgba(43,124,255,.14), rgba(124,199,255,.14));
+      border:1px solid rgba(43,124,255,.18);
+    }
+
+    .meta{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    .composer{
+      display:flex;
+      gap:10px;
+      padding:12px;
+      border-radius:18px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(216,231,245,.95);
+      align-items:flex-end;
+    }
+    textarea{
+      flex:1;
+      resize:none;
+      min-height:44px;
+      max-height:140px;
+      border-radius:14px;
+      border:1px solid rgba(216,231,245,.95);
+      background:rgba(246,251,255,.65);
+      padding:10px 12px;
+      font-family:var(--font);
+      font-size:14px;
+      outline:none;
+    }
+    textarea:focus{border-color:rgba(43,124,255,.38)}
+
+    .send{
+      width:52px;height:44px;
+      border:0;
+      border-radius:14px;
+      background:linear-gradient(135deg, var(--blue), var(--blue2));
+      color:white;
+      cursor:pointer;
+      display:grid;place-items:center;
+      box-shadow: 0 12px 22px rgba(43,124,255,.22);
+      transition:.15s;
+    }
+    .send:hover{transform:translateY(-1px)}
+    .send:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+    .thinking{display:inline-flex; gap:6px; align-items:center;}
+    .dot{width:7px;height:7px;border-radius:50%;background:rgba(10,37,64,.55);animation:bounce 1.1s infinite;}
+    .dot:nth-child(2){animation-delay:.15s}
+    .dot:nth-child(3){animation-delay:.30s}
+    @keyframes bounce{
+      0%, 80%, 100%{transform:translateY(0);opacity:.55}
+      40%{transform:translateY(-6px);opacity:1}
+    }
+
+    /* Mavi parlayan bellek bildirimi */
+    .toast{
+      position:absolute;
+      left:50%;
+      top:14px;
+      transform:translateX(-50%);
+      padding:10px 14px;
+      border-radius:999px;
+      background:linear-gradient(135deg, rgba(43,124,255,.22), rgba(124,199,255,.22));
+      border:1px solid rgba(43,124,255,.35);
+      color:#0a3a7a;
+      font-weight:800;
+      font-size:12px;
+      box-shadow: 0 16px 30px rgba(43,124,255,.22);
+      opacity:0;
+      pointer-events:none;
+      transition: .22s ease;
+      filter: drop-shadow(0 0 14px rgba(124,199,255,.55));
+      z-index:60;
+      backdrop-filter: blur(8px);
+      display:flex; align-items:center; gap:8px;
+    }
+    .toast .icon{filter: drop-shadow(0 0 8px rgba(124,199,255,.8))}
+    .toast.show{opacity:1}
+
+    @media (max-width: 900px){
+      .left{display:none}
+      .app{height:92vh}
+    }
+
+    /* Bellek modal */
+    .modal{position:absolute; inset:0; background:rgba(10,37,64,.35); display:none; align-items:center; justify-content:center; z-index:80;}
+    .modal.show{display:flex}
+    .modal .panel{width:min(520px,92%); background:white; border-radius:18px; border:1px solid rgba(216,231,245,.95); box-shadow:var(--shadow); padding:14px;}
+    .modal h3{margin:4px 0 10px 0}
+    .memlist{display:flex; flex-direction:column; gap:8px; max-height:320px; overflow:auto}
+    .memitem{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid rgba(216,231,245,.95); background:rgba(246,251,255,.7)}
+    .memitem b{font-size:13px}
+    .memitem span{font-size:12px; color:var(--muted)}
+    .memitem button{font-size:11px}
+    .modal .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:10px}
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="waves"></div>
+    <div class="toast" id="toast"><span class="icon">🧠</span><span id="toastText">Bellek güncellendi</span></div>
+
+    <aside class="left">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M21 12a9 9 0 1 1-3.2-6.9" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M21 12h-7" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Gai-1.0</h1>
+          <div class="sub">Sade asistan • Mavi-Beyaz tema</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:800; font-size:13px;">Sohbetler</div>
+        <div class="chatlist" id="chatList"></div>
+        <div class="minirow">
+          <button class="btn primary" id="btnNewChat">Yeni sohbet</button>
+          <button class="btn" id="btnRenameChat">Ad değiştir</button>
+          <button class="btn danger" id="btnDeleteChat">Sil</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:800; font-size:13px;">Ayarlar</div>
+        <div class="toggles">
+          <div class="toggle">
+            <div>
+              <label>Bellek referans al</label>
+              <small>Açıkken kişisel bilgileri kullanır • Kapalıyken geçici sohbet gibi davranır</small>
+            </div>
+            <div class="switch">
+              <input id="tMemRef" type="checkbox" checked />
+              <span class="slider"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="k">Mesaj</div>
+            <div class="v" id="statMsgs">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">Son konu</div>
+            <div class="v" id="statTopic">—</div>
+          </div>
+        </div>
+
+        <div class="btnrow">
+          <button class="btn" id="btnSeed">Örnek soru ekle</button>
+          <button class="btn danger" id="btnReset">Sohbeti temizle</button>
+          <button class="btn primary" id="btnAbout">Gai-1.0 hakkında</button>
+        </div>
+      </div>
+
+      <div class="card" style="font-size:12px;color:var(--muted)">
+        <div style="font-weight:800; color:var(--ink); margin-bottom:6px;">Not</div>
+        Bu Gai-1.0 bir demo: kural tabanlı düşünür.
+        İstersen bir sonraki adımda gerçek bir AI API’ye bağlarız.
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <span>Gai-1.0</span>
+          <span class="badge" id="modeBadge">Demo Mantık</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn" id="btnMemory">🧠 Bellek</button>
+          <span class="badge" id="memBadge">Bellek: Açık</span>
+          <span class="badge" id="safeBadge">Güvenlik: Açık</span>
+        </div>
+      </div>
+
+      <div class="chat" id="chat" aria-live="polite"></div>
+
+      <div class="composer">
+        <textarea id="input" placeholder="Gai-1.0'a yaz… (ör: ‘plan yap’, ‘açıkla: localStorage’, ‘1+1’, ‘şiir yaz’)" rows="1"></textarea>
+        <button class="send" id="send" title="Gönder">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M3 11.5l18-8-7.5 18-2.7-7.2L3 11.5z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </main>
+
+    <!-- Bellek Modal -->
+    <div class="modal" id="memModal">
+      <div class="panel">
+        <h3>🧠 Kayıtlı Bellek</h3>
+        <div class="memlist" id="memList"></div>
+        <div class="actions">
+          <button class="btn" id="btnClearMem">Tümünü sil</button>
+          <button class="btn primary" id="btnCloseMem">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== Gai-1.0 Core v1.2 (UI korunur) ======
+    // Debug logs: davranış hata ayıklama için console.log eklendi.
+
+    // DOM
+    const chatEl = document.getElementById('chat');
+    const inputEl = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const tMemRef = document.getElementById('tMemRef');
+
+    const statMsgs = document.getElementById('statMsgs');
+    const statTopic = document.getElementById('statTopic');
+    const memBadge = document.getElementById('memBadge');
+
+    const btnReset = document.getElementById('btnReset');
+    const btnSeed  = document.getElementById('btnSeed');
+    const btnAbout = document.getElementById('btnAbout');
+
+    const toastEl = document.getElementById('toast');
+
+    // Chats UI
+    const btnMemory = document.getElementById('btnMemory');
+    const memModal = document.getElementById('memModal');
+    const memListEl = document.getElementById('memList');
+    const btnCloseMem = document.getElementById('btnCloseMem');
+    const btnClearMem = document.getElementById('btnClearMem');
+    const chatListEl = document.getElementById('chatList');
+    const btnNewChat = document.getElementById('btnNewChat');
+    const btnRenameChat = document.getElementById('btnRenameChat');
+    const btnDeleteChat = document.getElementById('btnDeleteChat');
+
+    // Storage keys
+    const LS_INDEX = 'gai1_chats_index_v1';
+    const LS_SET   = 'gai1_settings_v1';
+    const chatKey = (id) => `gai1_chat_${id}`;
+    const memKey  = (id) => `gai1_mem_${id}`;
+
+    // State
+    const state = {
+      activeChatId: null,
+      index: [],
+      messages: [],
+      memory: {
+        userName: null,
+        age: null,
+        lastTopic: null,
+        lastIntent: null,
+        facts: {},
+        lastUserMsg: '',
+      },
+      // Not: sohbet kaydı her zaman açık (çoklu sohbet için gerekli)
+      settings: {
+        memRef: true,
+        safety: true,
+      }
+    };
+
+    // Helpers
+    const nowTime = () => new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const nowISO  = () => new Date().toISOString();
+    const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+    const esc = (s)=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+
+    function dbg(label, data){
+      // tek yerden kontrol etmek için
+      try{ console.log(`[Gai-1.0] ${label}`, data ?? ''); }catch{}
+    }
+
+    function showToast(text='Bellek güncellendi'){
+      const t = document.getElementById('toastText');
+      if(t) t.textContent = text;
+      toastEl.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=>toastEl.classList.remove('show'), 1600);
+    }
+
+    function scrollToBottom(){ chatEl.scrollTop = chatEl.scrollHeight; }
+
+    function renderMessage(m){
+      const wrap = document.createElement('div');
+      wrap.className = `msg ${m.role}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = m.role === 'user' ? '🧑' : '🤖';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = esc(m.text);
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = m.time;
+
+      const col = document.createElement('div');
+      col.appendChild(bubble);
+      col.appendChild(meta);
+
+      if(m.role === 'user'){ wrap.appendChild(col); wrap.appendChild(avatar); }
+      else { wrap.appendChild(avatar); wrap.appendChild(col); }
+
+      chatEl.appendChild(wrap);
+      scrollToBottom();
+    }
+
+    function renderAll(){
+      chatEl.innerHTML = '';
+      state.messages.forEach(renderMessage);
+      updateStats();
+      scrollToBottom();
+      dbg('renderAll', {count: state.messages.length, activeChatId: state.activeChatId});
+    }
+
+    function updateStats(){
+      statMsgs.textContent = String(state.messages.length);
+      statTopic.textContent = state.memory.lastTopic ? state.memory.lastTopic : '—';
+      memBadge.textContent = `Bellek: ${state.settings.memRef ? 'Açık' : 'Kapalı'}`;
+    }
+
+    function persist(){
+      // sohbet kaydı her zaman açık
+      try{
+        localStorage.setItem(LS_SET, JSON.stringify(state.settings));
+        localStorage.setItem(LS_INDEX, JSON.stringify(state.index));
+        localStorage.setItem(chatKey(state.activeChatId), JSON.stringify(state.messages));
+        localStorage.setItem(memKey(state.activeChatId), JSON.stringify(state.memory));
+        dbg('persist ok', {activeChatId: state.activeChatId, msgs: state.messages.length});
+      }catch(e){
+        console.warn('[Gai-1.0] Persist failed', e);
+      }
+    }
+
+    function addMessage(role, text, time=nowTime()){
+      state.messages.push({role,text,time});
+      renderMessage({role,text,time});
+      touchChat();
+      updateStats();
+      persist();
+      dbg('addMessage', {role, textPreview: String(text).slice(0,60)});
+    }
+
+    // Chat list
+    function shortPreview(id){
+      try{
+        const raw = localStorage.getItem(chatKey(id));
+        const msgs = raw ? JSON.parse(raw) : [];
+        const last = [...msgs].reverse().find(x=>x && x.text);
+        if(!last) return 'Boş sohbet';
+        const t = String(last.text).replace(/\s+/g,' ').trim();
+        return t.length>34 ? t.slice(0,34)+'…' : t;
+      }catch{ return 'Boş sohbet'; }
+    }
+
+    function renderChatList(){
+      const sorted = [...state.index].sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
+      chatListEl.innerHTML = '';
+      for(const c of sorted){
+        const item = document.createElement('div');
+        item.className = 'chatitem' + (c.id===state.activeChatId ? ' active' : '');
+        item.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:2px; min-width:0; overflow:hidden;">
+            <div class="name">${esc(c.name||'Sohbet')}</div>
+            <div class="mini">${esc(shortPreview(c.id))}</div>
+          </div>
+          <div class="dot2"></div>
+        `;
+        item.addEventListener('click', ()=>loadChat(c.id));
+        chatListEl.appendChild(item);
+      }
+    }
+
+    function touchChat(){
+      const it = state.index.find(x=>x.id===state.activeChatId);
+      if(it) it.updatedAt = nowISO();
+      renderChatList();
+    }
+
+    function newChat(name){
+      const id = 'c_' + Math.random().toString(16).slice(2) + '_' + Date.now().toString(16);
+      state.index.unshift({id, name: name||`Sohbet ${state.index.length+1}`, updatedAt: nowISO()});
+      state.activeChatId = id;
+      state.messages = [];
+      // kişisel bellek kalsın (memRef açık/kapalı sadece kullanım davranışını etkiler)
+      state.memory = {
+        userName: state.memory.userName ?? null,
+        age: state.memory.age ?? null,
+        lastTopic: null,
+        lastIntent: null,
+        facts: {...state.memory.facts},
+        lastUserMsg: ''
+      };
+      persist();
+      renderChatList();
+      renderAll();
+      bootGreeting(true);
+      dbg('newChat', {id, name});
+    }
+
+    function renameChat(){
+      const it = state.index.find(x=>x.id===state.activeChatId);
+      if(!it) return;
+      const n = prompt('Sohbet adı:', it.name||'Sohbet');
+      if(!n) return;
+      it.name = n.trim().slice(0,40);
+      it.updatedAt = nowISO();
+      persist();
+      renderChatList();
+      showToast('✅ Sohbet adı güncellendi');
+      dbg('renameChat', {id: it.id, name: it.name});
+    }
+
+    function deleteChat(){
+      const it = state.index.find(x=>x.id===state.activeChatId);
+      if(!it) return;
+      const ok = confirm(`“${it.name}” silinsin mi? (Geri alınamaz)`);
+      if(!ok) return;
+
+      try{
+        localStorage.removeItem(chatKey(it.id));
+        localStorage.removeItem(memKey(it.id));
+      }catch{}
+
+      state.index = state.index.filter(x=>x.id!==it.id);
+      if(state.index.length===0){
+        newChat('Sohbet 1');
+        return;
+      }
+
+      persist();
+      const recent = [...state.index].sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''))[0];
+      loadChat(recent.id);
+      showToast('✅ Sohbet silindi');
+      dbg('deleteChat', {deleted: it.id, next: recent.id});
+    }
+
+    function loadSettings(){
+      try{
+        const raw = localStorage.getItem(LS_SET);
+        if(raw) state.settings = {...state.settings, ...JSON.parse(raw)};
+      }catch{}
+      tMemRef.checked = !!state.settings.memRef;
+      updateStats();
+      dbg('loadSettings', {...state.settings});
+    }
+
+    function loadIndex(){
+      try{
+        const raw = localStorage.getItem(LS_INDEX);
+        if(raw) state.index = JSON.parse(raw);
+      }catch{}
+      dbg('loadIndex', {count: state.index.length});
+    }
+
+    function loadChat(id){
+      state.activeChatId = id;
+      try{
+        const c = localStorage.getItem(chatKey(id));
+        state.messages = c ? JSON.parse(c) : [];
+        const m = localStorage.getItem(memKey(id));
+        state.memory = m ? {...state.memory, ...JSON.parse(m)} : {...state.memory, facts:{}};
+      }catch(e){
+        console.warn('[Gai-1.0] loadChat failed', e);
+        state.messages = [];
+      }
+      renderAll();
+      renderChatList();
+      dbg('loadChat', {id, msgs: state.messages.length});
+    }
+
+    // Brain
+    function violatesSafety(text){
+      const t = text.toLowerCase();
+      const blocked = ['kendimi öldür','intihar','bomba yap','silah yap','uyuşturucu sat','hackle','şifre kır','kredi kartı çal','zararlı yazılım'];
+      return blocked.some(k=>t.includes(k));
+    }
+
+    function detectIntent(text){
+      const t = text.toLowerCase().trim();
+      if(/^[0-9\s+\-*/().,%]+$/.test(t) && /\d/.test(t) && /[+\-*/]/.test(t)) return 'math';
+      if(/\b(özet|kısaca|özetle)\b/.test(t)) return 'summarize';
+      if(/\b(plan|program|yol haritası)\b/.test(t)) return 'plan';
+      if(/\b(nedir|ne demek|açıkla)\b/.test(t)) return 'explain';
+      if(/\b(hatırla|kaydet)\b/.test(t)) return 'remember';
+      if(/\b(unut|sil)\b/.test(t)) return 'forget';
+      if(/\b(şiir)\b/.test(t) && /(yaz|oluştur|yap)/.test(t)) return 'poem';
+      if(/\b(ne üzerine çalışalım|ne yapalım|öner|fikir ver)\b/.test(t)) return 'suggest';
+      if(/\b(selam|merhaba|naber)\b/.test(t)) return 'greet';
+      return 'chat';
+    }
+
+    function detectTopic(text){
+      const t = text.toLowerCase();
+      const map = [
+        ['matematik', ['matematik','problem','denklem','çarp','böl','topla','çıkar']],
+        ['şiir', ['şiir','kafiye','uyak','hece']],
+        ['tarih', ['tarih','osmanlı','cumhuriyet','savaş','antlaşma']],
+        ['kod', ['kod','javascript','python','html','css','bug','hata']],
+        ['para', ['para kazan','satış','shopify','reklam','mağaza']]
+      ];
+      for(const [topic, keys] of map) if(keys.some(k=>t.includes(k))) return topic;
+      return null;
+    }
+
+    function maybeExtractName(text){
+      const m = text.match(/\b(adım|ismim|ben)\s+([A-Za-zÇĞİÖŞÜçğıöşü]{2,20})\b/i);
+      if(m){
+        state.memory.userName = m[2];
+        state.memory.facts['İsim'] = m[2];
+        showToast('✅ Bellek güncellendi: İsim');
+        dbg('memory set name', {name: state.memory.userName});
+        return true;
+      }
+      return false;
+    }
+
+    function maybeExtractAge(text){
+      const m = text.match(/\byaşım\s*(\d{1,3})\b/i) || text.match(/\b(\d{1,3})\s*yaşındayım\b/i);
+      if(m){
+        const age = parseInt(m[1],10);
+        if(Number.isFinite(age) && age>0 && age<130){
+          state.memory.age = age;
+          state.memory.facts['Yaş'] = String(age);
+          showToast('✅ Bellek güncellendi: Yaş');
+          dbg('memory set age', {age: state.memory.age});
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function rememberKV(text){
+      const m = text.match(/hatırla\s*[:\-]?\s*([^=:\n]{2,40})\s*(=|:)\s*(.{2,120})/i);
+      if(!m) return null;
+      const key = m[1].trim();
+      const val = m[3].trim();
+      state.memory.facts[key] = val;
+      if(state.settings.memRef) showToast('✅ Bellek güncellendi');
+      dbg('memory rememberKV', {key, val});
+      return {key,val};
+    }
+
+    function forgetKey(text){
+      const m = text.match(/\b(unut|sil)\s*[:\-]?\s*(.{2,40})/i);
+      if(!m) return null;
+      const key = m[2].trim();
+      if(state.memory.facts[key]==null) return null;
+      delete state.memory.facts[key];
+      if(key.toLowerCase().includes('yaş')) state.memory.age = null;
+      if(key.toLowerCase().includes('isim')) state.memory.userName = null;
+      if(state.settings.memRef) showToast('✅ Bellek güncellendi');
+      dbg('memory forgetKey', {key});
+      return key;
+    }
+
+    function safeMathEval(expr){
+      const clean = expr.replace(/,/g,'.').replace(/%/g,'/100');
+      if(!/^[0-9\s+\-*/().]+$/.test(clean)) return null;
+      try{
+        const fn = new Function(`return (${clean});`);
+        const v = fn();
+        return (typeof v==='number' && Number.isFinite(v)) ? v : null;
+      }catch(e){
+        dbg('math eval error', {expr, error: String(e)});
+        return null;
+      }
+    }
+
+    function generateReply(text){
+      const intent = detectIntent(text);
+      const topic = detectTopic(text);
+      state.memory.lastUserMsg = text;
+      state.memory.lastIntent = intent;
+      if(topic) state.memory.lastTopic = topic;
+
+      dbg('generateReply', {intent, topic, memRef: state.settings.memRef});
+
+      if(state.settings.safety && violatesSafety(text)){
+        return 'Buna yardımcı olamam.';
+      }
+
+      // Kişisel bilgi yakalama yalnızca memRef açıkken
+      if(state.settings.memRef){
+        maybeExtractName(text);
+        maybeExtractAge(text);
+      }
+
+      if(intent==='greet'){
+        const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
+        return `Merhaba${n}! Ben Gai-1.0 🤖 Bugün ne üzerinde çalışalım?`;
+      }
+
+      if(intent==='suggest'){
+        const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
+        return (
+`Bence bugün 3 seçenek var${n}:
+1) 💰 Para kazanma planı
+2) 🧠 Matematik/tarih
+3) 🎨 Şiir
+
+1/2/3 yaz 🙂`
+        );
+      }
+
+      if(intent==='math'){
+        const v = safeMathEval(text);
+        return v==null ? 'İfadeyi daha net yaz: 12*(3+4)' : `${text} = ${v}`;
+      }
+
+      if(intent==='poem'){
+        const n = (state.settings.memRef && state.memory.userName) ? state.memory.userName : 'dostum';
+        return (
+`Tabii ${n} ✨
+Mavi bir ışık düşer geceme,
+Düşünceler akar sessizce.
+Bir hedef koyarız önümüze,
+Adım adım varırız bizce.
+
+Konu ne olsun? (para/dostluk/okul/hayal)`
+        );
+      }
+
+      if(intent==='explain'){
+        if(text.toLowerCase().includes('localstorage')){
+          return (
+`localStorage nedir?
+- Tarayıcı içindeki küçük depodur.
+- Sayfayı yenilesen bile veriler kalır.
+- Sen silene kadar durur.
+
+Örnek:
+localStorage.setItem('isim','Kaan')
+localStorage.getItem('isim')`
+          );
+        }
+        return 'Tam olarak hangi kavramı açıklayayım? “açıkla: ...” yazabilirsin.';
+      }
+
+      if(intent==='plan'){
+        return (
+`Tamam. 3 adım:
+1) Hedef (1 cümle)
+2) Kısıtlar (zaman/bütçe)
+3) Bugün tek adım (15 dk)
+
+Hedef cümleni yaz 🙂`
+        );
+      }
+
+      if(intent==='remember'){
+        const kv = rememberKV(text);
+        return kv ? `Tamam. Hatırlıyorum: “${kv.key} = ${kv.val}”.` : '“hatırla: anahtar=değer” şeklinde yaz.';
+      }
+
+      if(intent==='forget'){
+        const key = forgetKey(text);
+        return key ? `Tamam. “${key}” silindi.` : '“unut: anahtar” yazabilirsin.';
+      }
+
+      if(intent==='summarize'){
+        const lastUser = [...state.messages].reverse().find(m=>m.role==='user');
+        const lastAI = [...state.messages].reverse().find(m=>m.role==='assistant');
+        return (
+`Kısa özet:
+- Son kullanıcı: ${lastUser ? lastUser.text.slice(0,70)+(lastUser.text.length>70?'…':'') : '—'}
+- Son yanıt: ${lastAI ? lastAI.text.slice(0,70)+(lastAI.text.length>70?'…':'') : '—'}
+- Konu: ${state.memory.lastTopic ?? '—'}`
+        );
+      }
+
+      const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
+      return (
+`Tamam${n}. Şunları deneyebilirsin:
+- "plan yap"
+- "açıkla: localStorage"
+- "1+1"
+- "şiir yaz"`
+      );
+    }
+
+    // Thinking UI
+    function showThinking(){
+      if(document.getElementById('thinking-msg')) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'msg assistant';
+      wrap.id = 'thinking-msg';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = '🤖';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = `Düşünüyorum <span class="thinking"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>`;
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = nowTime();
+
+      const col = document.createElement('div');
+      col.appendChild(bubble);
+      col.appendChild(meta);
+
+      wrap.appendChild(avatar);
+      wrap.appendChild(col);
+      chatEl.appendChild(wrap);
+      scrollToBottom();
+    }
+
+    function hideThinking(){
+      document.getElementById('thinking-msg')?.remove();
+    }
+
+    async function handleSend(){
+      const text = inputEl.value.trim();
+      if(!text) return;
+
+      inputEl.value = '';
+      autoResize();
+      addMessage('user', text);
+
+      sendBtn.disabled = true;
+      showThinking();
+
+      const latency = clamp(380 + Math.random()*520, 320, 900);
+      dbg('latency', {ms: Math.round(latency)});
+      await new Promise(r=>setTimeout(r, latency));
+
+      hideThinking();
+      const reply = generateReply(text);
+      addMessage('assistant', reply);
+
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+
+    function autoResize(){
+      inputEl.style.height = 'auto';
+      inputEl.style.height = clamp(inputEl.scrollHeight, 44, 140) + 'px';
+    }
+    inputEl.addEventListener('input', autoResize);
+    inputEl.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' && !e.shiftKey){
+        e.preventDefault();
+        handleSend();
+      }
+    });
+    sendBtn.addEventListener('click', handleSend);
+
+    // Settings
+    function syncSettings(){
+      state.settings.memRef = tMemRef.checked;
+      persist();
+      updateStats();
+      showToast(state.settings.memRef ? 'Bellek referansı açık' : 'Bellek referansı kapalı');
+      dbg('syncSettings', {memRef: state.settings.memRef});
+    }
+    tMemRef.addEventListener('change', syncSettings);
+
+    // Slider alanına tıklanınca checkbox'ı da toggle et (mobil/overlay click fix)
+    document.querySelectorAll('.switch').forEach(sw=>{
+      sw.addEventListener('click', (e)=>{
+        // input'a direkt tıklama zaten çalışıyorsa çift tetiklemeyi önle
+        if(e.target && e.target.tagName === 'INPUT') return;
+        const cb = sw.querySelector('input');
+        if(!cb) return;
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change', {bubbles:true}));
+        dbg('switch click toggle', {checked: cb.checked});
+      });
+    });
+
+    // Buttons
+    btnReset.addEventListener('click', ()=>{
+      const ok = confirm('Bu sohbetin mesajlarını temizlemek istiyor musun?');
+      if(!ok) return;
+      state.messages = [];
+      state.memory.lastTopic = null;
+      state.memory.lastIntent = null;
+      state.memory.lastUserMsg = '';
+      localStorage.removeItem(chatKey(state.activeChatId));
+      renderAll();
+      bootGreeting(true);
+      showToast('✅ Sohbet temizlendi');
+      dbg('btnReset', {activeChatId: state.activeChatId});
+    });
+
+    btnSeed.addEventListener('click', ()=>{
+      const seeds = ['İsmim Kaan','Yaşım 12','sence ne üzerine çalışalım','1+1','açıkla: localStorage','şiir yaz','Özetle','plan yap: para kazanmak'];
+      inputEl.value = seeds[Math.floor(Math.random()*seeds.length)];
+      autoResize(); inputEl.focus();
+      dbg('btnSeed', {value: inputEl.value});
+    });
+
+    btnAbout.addEventListener('click', ()=>{
+      addMessage('assistant',
+`Gai-1.0; tek sayfalık, kural tabanlı demo asistan 🤖
+- Niyet algılar (plan/açıkla/matematik/şiir/özet)
+- Bellek: isim/yaş + notlar
+- Çoklu sohbet: yeni/sil/ad değiştir
+- Düşünüyorum animasyonu
+
+İstersen bir sonraki sürümde gerçek AI API’ye bağlarız.`);
+      dbg('btnAbout');
+    });
+
+    btnNewChat.addEventListener('click', ()=>newChat());
+    btnRenameChat.addEventListener('click', ()=>renameChat());
+    btnDeleteChat.addEventListener('click', ()=>deleteChat());
+
+    function bootGreeting(force){
+      if(force || state.messages.length===0){
+        const n = (state.settings.memRef && state.memory.userName) ? ` ${state.memory.userName}` : '';
+        const a = (state.settings.memRef && state.memory.age) ? ` (yaş: ${state.memory.age})` : '';
+        addMessage('assistant', `Merhaba${n}! Ben Gai-1.0 🤖${a}\nSade bir asistanım. Bana bir hedef söyle; plan çıkarayım, açıklayayım, matematik çözeyim ya da şiir yazayım.`);
+      }
+    }
+
+    function renderMemoryList(){
+      memListEl.innerHTML = '';
+      const entries = Object.entries(state.memory.facts||{});
+      if(entries.length===0){
+        const empty = document.createElement('div');
+        empty.style.color = 'var(--muted)';
+        empty.textContent = 'Kayıtlı bellek yok.';
+        memListEl.appendChild(empty);
+        return;
+      }
+      for(const [k,v] of entries){
+        const row = document.createElement('div');
+        row.className = 'memitem';
+        row.innerHTML = `<div><b>${esc(k)}</b><br><span>${esc(v)}</span></div>`;
+        const del = document.createElement('button');
+        del.className = 'btn danger';
+        del.textContent = 'Sil';
+        del.addEventListener('click', ()=>{
+          delete state.memory.facts[k];
+          if(k.toLowerCase().includes('yaş')) state.memory.age = null;
+          if(k.toLowerCase().includes('isim')) state.memory.userName = null;
+          persist();
+          renderMemoryList();
+          showToast('Bellek silindi');
+          dbg('memory delete item', {key: k});
+        });
+        row.appendChild(del);
+        memListEl.appendChild(row);
+      }
+    }
+
+    btnMemory.addEventListener('click', ()=>{
+      renderMemoryList();
+      memModal.classList.add('show');
+      dbg('open memory modal');
+    });
+    btnCloseMem.addEventListener('click', ()=>{ memModal.classList.remove('show'); dbg('close memory modal'); });
+    memModal.addEventListener('click', (e)=>{ if(e.target===memModal) { memModal.classList.remove('show'); dbg('close memory modal (backdrop)'); } });
+    btnClearMem.addEventListener('click', ()=>{
+      const ok = confirm('Tüm bellek silinsin mi?');
+      if(!ok) return;
+      state.memory.facts = {};
+      state.memory.userName = null;
+      state.memory.age = null;
+      persist();
+      renderMemoryList();
+      showToast('Bellek temizlendi');
+      dbg('memory cleared');
+    });
+
+    // Basit self-test (konsola rapor yazar)
+    function runDiagnostics(){
+      const required = {
+        chatEl: !!chatEl,
+        inputEl: !!inputEl,
+        sendBtn: !!sendBtn,
+        tMemRef: !!tMemRef,
+        chatListEl: !!chatListEl,
+        memModal: !!memModal,
+        memListEl: !!memListEl,
+      };
+      const ok = Object.values(required).every(Boolean);
+      dbg('diagnostics', {ok, required});
+      return ok;
+    }
+
+    function boot(){
+      dbg('boot start');
+      loadSettings();
+      loadIndex();
+
+      if(state.index.length===0){
+        newChat('Sohbet 1');
+        runDiagnostics();
+        return;
+      }
+
+      const recent = [...state.index].sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''))[0];
+      loadChat(recent.id);
+      if(state.messages.length===0) bootGreeting(true);
+      runDiagnostics();
+      dbg('boot done', {activeChatId: state.activeChatId});
+    }
+
+    boot();
+  </script>
+</body>
+</html>
