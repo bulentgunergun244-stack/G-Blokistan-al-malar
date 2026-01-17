@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GEFIND — Oyun İçi Tarayıcı</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --panel2:#0f1730;
+      --text:#eaf0ff;
+      --muted:#a9b4d3;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 20px 60px rgba(0,0,0,.45);
+      --accent:#7c5cff;
+      --accent2:#22c1c3;
+      --danger:#ff4d6d;
+      --ok:#2ee59d;
+      --warn:#ffcc00;
+      --chip:rgba(255,255,255,.08);
+      --input:#0c132b;
+      --btn:#18224a;
+      --btnHover:#1d2a5c;
+      --focus:0 0 0 3px rgba(124,92,255,.25);
+      --radius:18px;
+      --radius2:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Light mode overrides */
+    [data-theme="light"]{
+      --bg:#f5f7ff;
+      --panel:#ffffff;
+      --panel2:#f0f3ff;
+      --text:#10162e;
+      --muted:#4f5b7a;
+      --border:rgba(10,18,46,.12);
+      --shadow:0 18px 48px rgba(16,22,46,.14);
+      --chip:rgba(16,22,46,.06);
+      --input:#ffffff;
+      --btn:#eef1ff;
+      --btnHover:#e2e7ff;
+      --focus:0 0 0 3px rgba(124,92,255,.22);
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(124,92,255,.25), transparent 60%),
+                  radial-gradient(900px 600px at 110% 10%, rgba(34,193,195,.18), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      overflow:hidden; /* Tam ekran kilitle */
+    }
+
+    .app{
+      width:100vw;
+      height:100vh;
+      max-width:100vw;
+      margin:0;
+      padding:8px 8px 36px; /* Altta hint için pay */
+      display:flex;
+      flex-direction:column;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:12px 14px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      position:relative; /* sticky kaldırıldı: üstte boşluk oluşturuyordu */
+      backdrop-filter: blur(10px);
+      z-index:50;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+    }
+    .logo{
+      width:34px;height:34px;
+      border-radius:12px;
+      background: conic-gradient(from 210deg, var(--accent), var(--accent2), var(--accent));
+      box-shadow: 0 10px 25px rgba(124,92,255,.35);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 50%);
+      transform: rotate(18deg);
+    }
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .brand small{display:block; font-size:12px; color:var(--muted); letter-spacing:.05em; margin-top:2px}
+
+    .actions{display:flex; gap:10px; align-items:center}
+
+    .btn{
+      border:1px solid var(--border);
+      background:var(--btn);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      font-weight:600;
+      cursor:pointer;
+      transition:.15s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{background:var(--btnHover); transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
+    .btn:focus{outline:none; box-shadow:var(--focus)}
+
+    .btn.icon{padding:10px; width:44px; justify-content:center}
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:var(--chip);
+      color:var(--muted);
+      font-size:12px;
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    .grid{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: 1fr; /* Tek ekran */
+      gap:10px;
+      flex:1;            /* Ekranın kalan tamamını doldur */
+      min-height:0;
+      overflow:hidden;  /* Alt siyah boşluk oluşmasını engelle */
+    }
+
+    .window{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border-radius:14px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .winHead{
+      padding:12px 12px 10px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .dotRow{display:flex; gap:8px; padding:0 4px}
+    .dot{width:10px;height:10px;border-radius:50%; background:rgba(255,255,255,.18)}
+    .dot.red{background:rgba(255,77,109,.9)}
+    .dot.yellow{background:rgba(255,204,0,.9)}
+    .dot.green{background:rgba(46,229,157,.9)}
+
+    .toolbar{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex:1;
+      min-width:0;
+    }
+
+    .miniBtn{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:var(--btn);
+      color:var(--text);
+      cursor:pointer;
+      transition:.15s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      user-select:none;
+    }
+    .miniBtn:hover{background:var(--btnHover)}
+    .miniBtn:disabled{opacity:.45; cursor:not-allowed}
+
+    .urlWrap{flex:1; min-width:0; position:relative}
+    .url{
+      width:100%;
+      height:40px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:var(--input);
+      color:var(--text);
+      padding:0 12px 0 40px;
+      font-weight:600;
+      outline:none;
+      transition:.15s ease;
+    }
+    .url:focus{box-shadow:var(--focus)}
+    .url::placeholder{color:rgba(169,180,211,.75); font-weight:600}
+
+    .magnifier{
+      position:absolute;
+      left:12px;
+      top:50%;
+      transform:translateY(-50%);
+      opacity:.7;
+      font-size:14px;
+      pointer-events:none;
+    }
+
+    .winTitle{
+      padding:10px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px solid var(--border);
+      background:rgba(255,255,255,.02);
+    }
+
+    .winTitle .left{min-width:0}
+    .winTitle .name{
+      font-weight:800;
+      letter-spacing:.02em;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .winTitle .meta{font-size:12px; color:var(--muted)}
+
+    .chip{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:var(--chip);
+      color:var(--muted);
+    }
+
+    .content{
+      flex:1;
+      min-height:0;
+      background:var(--panel2);
+      position:relative;
+    }
+
+    iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      background: white;
+    }
+
+    .overlay{
+      position:absolute;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.35));
+      color:white;
+      text-align:center;
+    }
+    .overlay.show{display:flex}
+
+    .card{
+      max-width:520px;
+      width:100%;
+      background: rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:18px;
+      padding:16px 16px 14px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 20px 55px rgba(0,0,0,.25);
+    }
+
+    .card h3{margin:0 0 6px; font-size:16px}
+    .card p{margin:0 0 12px; color:rgba(255,255,255,.85); font-size:13px; line-height:1.35}
+    .card .row{display:flex; gap:10px; flex-wrap:wrap; justify-content:center}
+
+    .danger{background: rgba(255,77,109,.12); border-color: rgba(255,77,109,.22)}
+
+    .kbd{
+      font-family:var(--mono);
+      font-size:12px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      padding:3px 7px;
+      border-radius:10px;
+      display:inline-block;
+      margin:0 4px;
+    }
+
+    /* Modal */
+    .modalBack{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:100;
+    }
+    .modalBack.show{display:flex}
+
+    .modal{
+      width:min(820px, 100%);
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modalHead{
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+    .modalHead h2{margin:0; font-size:16px; letter-spacing:.02em}
+    .modalBody{padding:14px 16px 16px}
+
+    .history{
+      margin-top:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-height:380px;
+      overflow:auto;
+      padding-right:4px;
+    }
+
+    .hItem{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      background: rgba(255,255,255,.03);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .hItem .info{min-width:0}
+    .hItem .t{
+      font-weight:800;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      margin-bottom:3px;
+    }
+    .hItem .u{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      margin-bottom:6px;
+    }
+    .hItem .d{font-size:12px; color:var(--muted)}
+
+    .hBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+
+    .btn.danger{
+      background: rgba(255,77,109,.14);
+      border-color: rgba(255,77,109,.22);
+      color: var(--text);
+    }
+    .btn.danger:hover{background: rgba(255,77,109,.22)}
+
+    .btn.ghost{
+      background: transparent;
+    }
+
+    .empty{
+      border:1px dashed var(--border);
+      border-radius:16px;
+      padding:14px;
+      color:var(--muted);
+      background: rgba(255,255,255,.02);
+    }
+
+    /* Tiny footer hint */
+    .hint{
+      position:absolute;   /* Akışı bozmasın */
+      left:12px;
+      right:12px;
+      bottom:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.4;
+      pointer-events:none; /* Tıklamayı engellemesin */
+      opacity:.9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" id="app" data-theme="dark">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>GEFIND</h1>
+          <small>Oyun içi AI destekli tarayıcı demosu (şimdilik sadece tarayıcı)</small>
+        </div>
+      </div>
+
+      <div class="actions">
+        <span class="pill" id="winCount">🪟 0 pencere</span>
+        <button class="btn" id="addWin">➕ Pencere Aç</button>
+        <button class="btn" id="openSettings">⚙️ Ayarlar</button>
+        <button class="btn" id="toggleTheme">🌙 Koyu</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="hint">
+      ⚠️ Not: Bu “oyun içi tarayıcı” demo olduğu için bazı siteler <span class="kbd">iframe</span> içinde açılmayabilir (güvenlik politikaları yüzünden). Böyle durumlarda “Yeni Sekmede Aç” ile tarayıcının kendi sekmesinde açmayı dene.
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modalBack" id="modalBack" role="dialog" aria-modal="true" aria-label="Ayarlar">
+      <div class="modal">
+        <div class="modalHead">
+          <h2>⚙️ Ayarlar — Geçmiş Yönetimi</h2>
+          <button class="btn icon" id="closeSettings" aria-label="Kapat">✖️</button>
+        </div>
+        <div class="modalBody">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+            <div class="pill" id="histCount">🕘 0 kayıt</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn danger" id="clearHistory">🧹 Tüm Geçmişi Sil</button>
+              <button class="btn" id="exportHistory">📦 Dışa Aktar</button>
+              <button class="btn" id="importHistory">📥 İçe Aktar</button>
+            </div>
+          </div>
+
+          <div class="history" id="historyList"></div>
+          <div class="hint">
+            İpucu: Bir kaydı tıklayınca ilgili sayfayı yeni pencereye yükleyebilirsin. (Oyun mantığı için: ileride buraya AI önerileri de ekleriz 😄)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /**********************
+     * GEFIND — Oyun İçi Tarayıcı (Tek Dosya)
+     * Özellikler:
+     * - Pencere Aç/Kapa (çoklu pencere)
+     * - Arama çubuğu + URL giriş
+     * - Geri/İleri/Yenile
+     * - Koyu/Açık tema
+     * - Geçmiş (localStorage)
+     * - Ayarlar: geçmişi tek tek sil / hepsini sil
+     **********************/
+
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    const LS_KEYS = {
+      THEME: 'gef_theme_v1',
+      HISTORY: 'gef_history_v1',
+      WIN_STATE: 'gef_windows_v1'
+    };
+
+    function nowISO(){
+      const d = new Date();
+      return d.toISOString();
+    }
+
+    function prettyDate(iso){
+      try{
+        const d = new Date(iso);
+        return d.toLocaleString('tr-TR', {year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+      }catch{ return iso; }
+    }
+
+    function normalizeInputToUrlOrSearch(input){
+      const raw = (input||'').trim();
+      if(!raw) return {kind:'home', value:''};
+
+      // If it looks like a URL
+      const hasProtocol = /^https?:\/\//i.test(raw);
+      const looksLikeDomain = /^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(raw);
+      const isLocal = /^about:|^data:|^blob:|^file:/i.test(raw);
+
+      if(hasProtocol) return {kind:'url', value: raw};
+      if(isLocal) return {kind:'url', value: raw};
+      if(looksLikeDomain) return {kind:'url', value: 'https://' + raw};
+
+      // Otherwise treat as search → GEFIND kendi iç arama ekranını kullanır (iframe güvenlik engelleri yüzünden)
+      return {kind:'search', value: raw};
+    }
+
+    function getHistory(){
+      try{
+        const h = JSON.parse(localStorage.getItem(LS_KEYS.HISTORY) || '[]');
+        return Array.isArray(h) ? h : [];
+      }catch{ return []; }
+    }
+
+    function setHistory(list){
+      localStorage.setItem(LS_KEYS.HISTORY, JSON.stringify(list));
+      renderHistory();
+    }
+
+    function addHistoryEntry({title, url}){
+      const list = getHistory();
+      const entry = {
+        id: crypto.randomUUID(),
+        title: title || '(Başlıksız)',
+        url,
+        time: nowISO()
+      };
+      list.unshift(entry);
+      // keep it reasonable
+      setHistory(list.slice(0, 250));
+    }
+
+    function saveWindowsState(){
+      const state = windows.map(w => ({
+        id: w.id,
+        label: w.label,
+        current: w.current,
+        back: w.back,
+        forward: w.forward,
+        lastTitle: w.lastTitle
+      }));
+      localStorage.setItem(LS_KEYS.WIN_STATE, JSON.stringify(state));
+    }
+
+    function loadWindowsState(){
+      try{
+        const st = JSON.parse(localStorage.getItem(LS_KEYS.WIN_STATE) || '[]');
+        return Array.isArray(st) ? st : [];
+      }catch{ return []; }
+    }
+
+    function setTheme(theme){
+      const app = $('#app');
+      app.setAttribute('data-theme', theme);
+      localStorage.setItem(LS_KEYS.THEME, theme);
+      const btn = $('#toggleTheme');
+      btn.textContent = theme === 'dark' ? '🌙 Koyu' : '☀️ Açık';
+    }
+
+    function getTheme(){
+      return localStorage.getItem(LS_KEYS.THEME) || 'dark';
+    }
+
+    /***************
+     * Fake Home/Search Page (local)
+     ***************/
+
+    function makeHomeDoc(){
+      const theme = $('#app').getAttribute('data-theme');
+      const bg = theme === 'dark' ? '#0b1020' : '#f5f7ff';
+      const text = theme === 'dark' ? '#eaf0ff' : '#10162e';
+      const muted = theme === 'dark' ? '#a9b4d3' : '#4f5b7a';
+      const card = theme === 'dark' ? 'rgba(255,255,255,.08)' : 'rgba(16,22,46,.05)';
+      const border = theme === 'dark' ? 'rgba(255,255,255,.10)' : 'rgba(10,18,46,.12)';
+
+      return `<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GEFIND Home</title>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:${bg};color:${text};}
+  .wrap{padding:28px;max-width:900px;margin:0 auto;}
+  .hero{display:flex;gap:14px;align-items:center;margin-bottom:18px;}
+  .logo{width:42px;height:42px;border-radius:16px;background:conic-gradient(from 210deg,#7c5cff,#22c1c3,#7c5cff);box-shadow:0 12px 28px rgba(124,92,255,.35)}
+  h1{margin:0;font-size:22px;letter-spacing:.18em;text-transform:uppercase}
+  p{margin:6px 0 0;color:${muted};line-height:1.4}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px;}
+  @media(min-width:820px){.grid{grid-template-columns:1fr 1fr}}
+  .c{border:1px solid ${border};background:${card};border-radius:18px;padding:14px;}
+  .c h3{margin:0 0 6px;font-size:15px}
+  .c ul{margin:0;padding-left:18px;color:${muted};line-height:1.5}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:3px 7px;border-radius:10px;display:inline-block;margin:0 3px}
+  a{color:inherit}
+</style></head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="logo"></div>
+      <div>
+        <h1>GEFIND</h1>
+        <p>Bu bir oyun içi tarayıcı demosu. Üste yazıp Enter'a bas: URL aç veya arama yap. 😄</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="c">
+        <h3>✅ Hızlı Kısayollar</h3>
+        <ul>
+          <li>URL: <span class="kbd">example.com</span> yaz → otomatik <span class="kbd">https://</span> ekler.</li>
+          <li>Arama: <span class="kbd">roblox scripting</span> yaz → sonuç sayfası üretir.</li>
+          <li>Yeni sekmede açmak için: sonuçlarda “Yeni Sekmede Aç”.</li>
+        </ul>
+      </div>
+      <div class="c">
+        <h3>🧠 AI kısmı (sonra)</h3>
+        <ul>
+          <li>Şimdilik sadece tarayıcı altyapısı.</li>
+          <li>Az sonra if/else “mini AI” ekleriz (oyun içi).</li>
+          <li>Öneriler, içerik filtreleme, akıllı geçmiş vb.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="c" style="margin-top:12px">
+      <h3>⚠️ Güvenlik Notu</h3>
+      <ul>
+        <li>Her site iframe içinde açılmayabilir. Bu normal.</li>
+        <li>O durumda “Yeni Sekmede Aç” kullan.</li>
+      </ul>
+    </div>
+
+  </div>
+</body></html>`;
+    }
+
+    function makeSearchDoc(query){
+      const safe = (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      const q = safe(query);
+      const theme = $('#app').getAttribute('data-theme');
+      const bg = theme === 'dark' ? '#0b1020' : '#f5f7ff';
+      const text = theme === 'dark' ? '#eaf0ff' : '#10162e';
+      const muted = theme === 'dark' ? '#a9b4d3' : '#4f5b7a';
+      const card = theme === 'dark' ? 'rgba(255,255,255,.08)' : 'rgba(16,22,46,.05)';
+      const border = theme === 'dark' ? 'rgba(255,255,255,.10)' : 'rgba(10,18,46,.12)';
+
+      // We can't fetch real web results reliably (CORS/XFO). So we create "smart" external links.
+      // User can open in a new tab.
+      const links = [
+        {name:"GEFIND Sonuç 1", content:`<h1>${q}</h1><p>Bu içerik GEFIND'in kendi iç simülasyon sonucudur. Gerçek web çağrısı yapılmaz.</p>`},
+        {name:"GEFIND Sonuç 2", content:`<h2>${q} — Özet</h2><p>Oyun içi tarayıcı demo modunda üretilmiş örnek sonuç.</p>`},
+        {name:"GEFIND Sonuç 3", content:`<h2>${q}</h2><ul><li>Madde 1</li><li>Madde 2</li></ul>`}
+      ];
+
+      const linkHtml = links.map(l => {
+        const html = `<html><body style='font-family:system-ui;padding:18px'>
+          <h2>${l.name}</h2>${l.content}
+        </body></html>`;
+        const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+        return `
+        <div class="r">
+          <a class="t link" href="#" onclick="parent.postMessage({type:'openInFrame', url:'${dataUrl}'}, '*'); return false;">${l.name}</a>
+          <div class="u">GEFIND iç sonucu</div>
+        </div>
+      `;
+      }).join('');
+
+      return `<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GEFIND Search</title>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:${bg};color:${text};}
+  .wrap{padding:22px;max-width:980px;margin:0 auto;}
+  .top{display:flex;align-items:center;gap:12px;}
+  .logo{width:34px;height:34px;border-radius:14px;background:conic-gradient(from 210deg,#7c5cff,#22c1c3,#7c5cff);box-shadow:0 12px 28px rgba(124,92,255,.35)}
+  h1{margin:0;font-size:16px;letter-spacing:.18em;text-transform:uppercase}
+  .q{margin:10px 0 0;color:${muted};line-height:1.4}
+  .box{margin-top:14px;border:1px solid ${border};background:${card};border-radius:18px;padding:14px;}
+  .box h2{margin:0 0 8px;font-size:14px}
+  .r{border:1px solid ${border};background:rgba(255,255,255,.03);border-radius:16px;padding:12px;margin-top:10px;}
+  .t{font-weight:800;margin-bottom:4px}
+  .link{color:#4da3ff; text-decoration:underline; cursor:pointer}
+  .link:hover{color:#7cbcff}
+  .u{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;color:${muted};overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .note{margin-top:10px;color:${muted};font-size:12px;line-height:1.4}
+</style></head>
+<body>
+  <div class="wrap">
+    <div class="top"><div class="logo"></div><div><h1>GEFIND</h1><div class="q">Arama: <b>${q}</b></div></div></div>
+
+    <div class="box">
+      <h2>🔎 Gerçek sonuçları yeni sekmede aç (önerilir)</h2>
+      ${linkHtml}
+      <div class="note">Not: Bazı siteler iframe içinde açılmayabilir. Bu durumda “Yeni Sekmede Aç” kesin çalışır.</div>
+    </div>
+
+    <div class="box" style="margin-top:12px">
+      <h2>⚡ Oyun İçi Not</h2>
+      <div class="note">
+        Bir sonraki adımda buraya if/else “mini AI” koyacağız: örn. zararlı içerik filtresi, otomatik öneri, kısaltmalar, komutlar (\"/youtube\", \"/wiki\" gibi).
+      </div>
+    </div>
+  </div>
+</body></html>`;
+    }
+
+    /***************
+     * Windows model
+     ***************/
+
+    let windows = [];
+
+    function newWindow(state){
+      const id = state?.id || crypto.randomUUID();
+      const w = {
+        id,
+        label: state?.label || `Pencere ${windows.length + 1}`,
+        current: state?.current || {kind:'home', value:''},
+        back: Array.isArray(state?.back) ? state.back : [],
+        forward: Array.isArray(state?.forward) ? state.forward : [],
+        lastTitle: state?.lastTitle || 'GEFIND'
+      };
+      windows.push(w);
+      render();
+      return w;
+    }
+
+    function closeWindow(id){
+      windows = windows.filter(w => w.id !== id);
+      saveWindowsState();
+      render();
+    }
+
+    function goTo(w, target, pushHistory=true){
+      if(pushHistory && w.current){
+        w.back.push(w.current);
+        if(w.back.length > 80) w.back = w.back.slice(-80);
+      }
+      w.forward = [];
+      w.current = target;
+      saveWindowsState();
+      render();
+    }
+
+    function back(w){
+      if(!w.back.length) return;
+      w.forward.push(w.current);
+      w.current = w.back.pop();
+      saveWindowsState();
+      render();
+    }
+
+    function forward(w){
+      if(!w.forward.length) return;
+      w.back.push(w.current);
+      w.current = w.forward.pop();
+      saveWindowsState();
+      render();
+    }
+
+    function refresh(w){
+      // Simply re-render, iframe/srcdoc will be re-applied.
+      render();
+    }
+
+    function getDisplayUrl(target){
+      if(!target) return '';
+      if(target.kind === 'home') return 'GEFIND://home';
+      if(target.kind === 'search') return `GEFIND://search?q=${encodeURIComponent(target.value)}`;
+      return target.value;
+    }
+
+    function titleFor(target){
+      if(!target) return 'GEFIND';
+      if(target.kind === 'home') return 'GEFIND Home';
+      if(target.kind === 'search') return `Ara: ${target.value}`;
+      try{
+        const u = new URL(target.value);
+        return u.hostname;
+      }catch{
+        return 'GEFIND';
+      }
+    }
+
+    function isProbablyEmbeddable(url){
+      // We cannot know for sure. Heuristic: common places that often block iframes.
+      const blockList = [
+        'google.com', 'accounts.google.com',
+        'youtube.com', 'm.youtube.com',
+        'facebook.com', 'instagram.com',
+        'x.com', 'twitter.com'
+      ];
+      try{
+        const u = new URL(url);
+        return !blockList.some(d => u.hostname.endsWith(d));
+      }catch{
+        return true;
+      }
+    }
+
+    /***************
+     * Render
+     ***************/
+
+    function render(){
+      const grid = $('#grid');
+      const winCount = $('#winCount');
+      winCount.textContent = `🪟 ${windows.length} pencere`;
+
+      if(windows.length === 0){
+        // auto create one
+        newWindow();
+        return;
+      }
+
+      grid.innerHTML = windows.map(w => windowTemplate(w)).join('');
+
+      // Bind events
+      windows.forEach(w => {
+        const root = $(`[data-win='${w.id}']`);
+        if(!root) return;
+
+        const urlInput = $('.url', root);
+        urlInput.value = getDisplayUrl(w.current);
+
+        const bBack = $('.goBack', root);
+        const bFwd = $('.goFwd', root);
+        const bRef = $('.goRef', root);
+        const bClose = $('.closeWin', root);
+
+        bBack.disabled = w.back.length === 0;
+        bFwd.disabled = w.forward.length === 0;
+
+        bBack.onclick = () => back(w);
+        bFwd.onclick = () => forward(w);
+        bRef.onclick = () => refresh(w);
+        bClose.onclick = () => closeWindow(w.id);
+
+        urlInput.onkeydown = (e) => {
+          if(e.key === 'Enter'){
+            const parsed = normalizeInputToUrlOrSearch(urlInput.value);
+            goTo(w, parsed);
+          }
+        };
+
+        const goBtn = $('.goBtn', root);
+        goBtn.onclick = () => {
+          const parsed = normalizeInputToUrlOrSearch(urlInput.value);
+          goTo(w, parsed);
+        };
+
+        const openNewTab = $('.openNewTab', root);
+        openNewTab.onclick = () => {
+          const disp = getDisplayUrl(w.current);
+          // If it's internal doc, open a fallback to external search/home in a new tab.
+          if(disp.startsWith('GEFIND://')){
+            // open about:blank + message
+            const html = `<html><head><meta charset='utf-8'><title>GEFIND</title></head><body style='font-family:system-ui;padding:18px'>Bu sayfa GEFIND iç sayfası. Yeni sekmede gerçek web açmak için URL gir. 🙂</body></html>`;
+            const blob = new Blob([html], {type:'text/html'});
+            window.open(URL.createObjectURL(blob), '_blank', 'noopener');
+            return;
+          }
+          window.open(disp, '_blank', 'noopener');
+        };
+
+        // Setup iframe
+        const frame = $('.frame', root);
+        const overlay = $('.overlay', root);
+
+        overlay.classList.remove('show');
+        overlay.innerHTML = '';
+
+        if(w.current.kind === 'home'){
+          frame.removeAttribute('src');
+          frame.srcdoc = makeHomeDoc();
+          w.lastTitle = titleFor(w.current);
+        } else if(w.current.kind === 'search'){
+          frame.removeAttribute('src');
+          frame.srcdoc = makeSearchDoc(w.current.value);
+          w.lastTitle = titleFor(w.current);
+          addHistoryEntry({title: w.lastTitle, url: getDisplayUrl(w.current)});
+        } else {
+          // URL
+          const url = w.current.value;
+          frame.srcdoc = '';
+          frame.src = url;
+          w.lastTitle = titleFor(w.current);
+
+          // add to history
+          addHistoryEntry({title: w.lastTitle, url});
+
+          // Heuristic overlay note for likely blocked embeds
+          if(!isProbablyEmbeddable(url)){
+            overlay.classList.add('show');
+            overlay.innerHTML = blockedOverlayHtml(url);
+            const btn = $('.openExt', overlay);
+            btn.onclick = () => window.open(url, '_blank', 'noopener');
+          }
+
+          // If the page refuses to load, show overlay.
+          frame.onload = () => {
+            // If it loads, hide overlay.
+            overlay.classList.remove('show');
+          };
+          frame.onerror = () => {
+            overlay.classList.add('show');
+            overlay.innerHTML = blockedOverlayHtml(url, true);
+            const btn = $('.openExt', overlay);
+            btn.onclick = () => window.open(url, '_blank', 'noopener');
+          };
+        }
+
+        // Title + meta
+        $('.name', root).textContent = w.lastTitle;
+        $('.meta', root).textContent = `${w.label} • ${w.current.kind === 'url' ? 'Web' : 'İç sayfa'}`;
+        $('.chip', root).textContent = getDisplayUrl(w.current);
+
+        saveWindowsState();
+      });
+    }
+
+    function windowTemplate(w){
+      return `
+      <section class="window" data-win="${w.id}">
+        <div class="winHead">
+          <div class="dotRow" title="Pencere kontrol">
+            <span class="dot red" aria-hidden="true"></span>
+            <span class="dot yellow" aria-hidden="true"></span>
+            <span class="dot green" aria-hidden="true"></span>
+          </div>
+
+          <div class="toolbar">
+            <button class="miniBtn goBack" title="Geri">⟵</button>
+            <button class="miniBtn goFwd" title="İleri">⟶</button>
+            <button class="miniBtn goRef" title="Yenile">↻</button>
+
+            <div class="urlWrap">
+              <span class="magnifier" aria-hidden="true">🔎</span>
+              <input class="url" placeholder="Ara veya URL yaz… (Enter)" spellcheck="false" />
+            </div>
+
+            <button class="miniBtn goBtn" title="Git">↵</button>
+
+            <button class="miniBtn openNewTab" title="Yeni sekmede aç">⧉</button>
+            <button class="miniBtn closeWin" title="Pencereyi kapat">✖</button>
+          </div>
+        </div>
+
+        <div class="winTitle">
+          <div class="left">
+            <div class="name">GEFIND</div>
+            <div class="meta">${w.label}</div>
+          </div>
+          <div class="chip chip">GEFIND://home</div>
+        </div>
+
+        <div class="content">
+          <iframe class="frame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+          <div class="overlay"></div>
+        </div>
+      </section>`;
+    }
+
+    function blockedOverlayHtml(url, isError=false){
+      const safe = String(url).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      return `
+        <div class="card ${isError ? 'danger' : ''}">
+          <h3>${isError ? 'Bu sayfa yüklenemedi' : 'Bu site bu pencerede açılmayabilir'}</h3>
+          <p>
+            Bazı web siteleri güvenlik nedeniyle oyun içi çerçevede (iframe) açılmayı engeller.
+            <br><br>
+            URL: <span class="kbd">${safe}</span>
+          </p>
+          <div class="row">
+            <button class="btn openExt">🔗 Yeni Sekmede Aç</button>
+          </div>
+        </div>
+      `;
+    }
+
+    /***************
+     * Modal + History UI
+     ***************/
+
+    function openModal(){
+      $('#modalBack').classList.add('show');
+      renderHistory();
+    }
+    function closeModal(){
+      $('#modalBack').classList.remove('show');
+    }
+
+    function renderHistory(){
+      const listEl = $('#historyList');
+      const countEl = $('#histCount');
+      const hist = getHistory();
+      countEl.textContent = `🕘 ${hist.length} kayıt`;
+
+      if(hist.length === 0){
+        listEl.innerHTML = `<div class="empty">Geçmiş boş. (Bir şey arat veya URL aç, kayıt düşsün.)</div>`;
+        return;
+      }
+
+      listEl.innerHTML = hist.map(item => `
+        <div class="hItem" data-hid="${item.id}">
+          <div class="info">
+            <div class="t" title="${escapeAttr(item.title)}">${escapeHtml(item.title)}</div>
+            <div class="u" title="${escapeAttr(item.url)}">${escapeHtml(item.url)}</div>
+            <div class="d">${prettyDate(item.time)}</div>
+          </div>
+          <div class="hBtns">
+            <button class="btn" data-act="load">🪟 Yükle</button>
+            <button class="btn" data-act="newtab">⧉ Yeni Sekme</button>
+            <button class="btn danger" data-act="del">🗑️ Sil</button>
+          </div>
+        </div>
+      `).join('');
+
+      $$('.hItem', listEl).forEach(row => {
+        const id = row.getAttribute('data-hid');
+        const item = hist.find(x => x.id === id);
+        if(!item) return;
+
+        const loadBtn = $('[data-act="load"]', row);
+        const tabBtn  = $('[data-act="newtab"]', row);
+        const delBtn  = $('[data-act="del"]', row);
+
+        loadBtn.onclick = () => {
+          // Load into a new window (like "pencere aç" behavior)
+          const w = newWindow({ label: `Geçmiş` });
+          const parsed = normalizeInputToUrlOrSearch(item.url);
+          goTo(w, parsed, false);
+          closeModal();
+        };
+
+        tabBtn.onclick = () => {
+          // If internal scheme, fall back to opening a search page in new tab
+          if(String(item.url).startsWith('GEFIND://')){
+            const html = `<html><head><meta charset='utf-8'><title>GEFIND</title></head><body style='font-family:system-ui;padding:18px'>Bu bir GEFIND iç kaydı: <b>${escapeHtml(item.url)}</b><br>Yeni sekmede gerçek web açmak için URL gir. 🙂</body></html>`;
+            const blob = new Blob([html], {type:'text/html'});
+            window.open(URL.createObjectURL(blob), '_blank', 'noopener');
+          } else {
+            window.open(item.url, '_blank', 'noopener');
+          }
+        };
+
+        delBtn.onclick = () => {
+          setHistory(hist.filter(x => x.id !== id));
+        };
+      });
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+    function escapeAttr(s){
+      return escapeHtml(s).replace(/\n/g,' ');
+    }
+
+    /***************
+     * History Import/Export (optional but nice)
+     ***************/
+
+    function downloadJson(filename, obj){
+      const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1200);
+    }
+
+    function pickJsonFile(){
+      return new Promise((resolve) => {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'application/json';
+        inp.onchange = () => resolve(inp.files?.[0] || null);
+        inp.click();
+      });
+    }
+
+    async function importHistory(){
+      const file = await pickJsonFile();
+      if(!file) return;
+      try{
+        const txt = await file.text();
+        const data = JSON.parse(txt);
+        if(!Array.isArray(data)) throw new Error('Format hatalı');
+        // basic sanitize
+        const cleaned = data
+          .filter(x => x && typeof x.url === 'string')
+          .map(x => ({
+            id: x.id || crypto.randomUUID(),
+            title: typeof x.title === 'string' ? x.title.slice(0,120) : '(İçe Aktarılan)',
+            url: x.url.slice(0, 2048),
+            time: typeof x.time === 'string' ? x.time : nowISO()
+          }));
+        setHistory(cleaned.concat(getHistory()).slice(0, 250));
+      }catch(err){
+        alert('İçe aktarma başarısız: ' + (err?.message || err));
+      }
+    }
+
+    /***************
+     * Message bridge from iframe (search page)
+     ***************/
+
+    window.addEventListener('message', (ev) => {
+      if(!ev?.data || typeof ev.data !== 'object') return;
+      if(ev.data.type === 'openInFrame' && typeof ev.data.url === 'string'){
+        // Find which window's iframe sent this
+        const frames = $$('.frame');
+        const idx = frames.findIndex(f => f.contentWindow === ev.source);
+        if(idx === -1) return;
+        const w = windows[idx];
+        if(!w) return;
+        const parsed = normalizeInputToUrlOrSearch(ev.data.url);
+        goTo(w, parsed);
+      }
+    });
+
+    /***************
+     * Init
+     ***************/
+
+    $('#addWin').onclick = () => newWindow();
+    $('#openSettings').onclick = openModal;
+    $('#closeSettings').onclick = closeModal;
+    $('#modalBack').onclick = (e) => { if(e.target === $('#modalBack')) closeModal(); };
+
+    $('#toggleTheme').onclick = () => {
+      const current = $('#app').getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+      // re-render internal docs to match theme
+      render();
+    };
+
+    $('#clearHistory').onclick = () => {
+      if(confirm('Tüm geçmiş silinsin mi?')) setHistory([]);
+    };
+
+    $('#exportHistory').onclick = () => {
+      downloadJson('gef_history.json', getHistory());
+    };
+
+    $('#importHistory').onclick = () => importHistory();
+
+    // Restore theme
+    setTheme(getTheme());
+
+    // Restore windows
+    const saved = loadWindowsState();
+    if(saved.length){
+      windows = [];
+      saved.slice(0, 6).forEach(st => newWindow(st));
+    } else {
+      newWindow();
+    }
+
+    // Keyboard shortcuts (global)
+    window.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') closeModal();
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){
+        e.preventDefault();
+        // focus first window url
+        const first = $('.window .url');
+        first?.focus();
+      }
+    });
+
+    renderHistory();
+    render();
+  </script>
+</body>
+</html>
